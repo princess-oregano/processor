@@ -14,7 +14,7 @@ enum cmd_t {
         CMD_MUL  = 4,
         CMD_DIV  = 5,
         CMD_OUT  = 6,
-        CMD_DMP  = 0xBEBEBEBE,
+        CMD_DMP  = -1,
 };
 
 // Converts text to int array with machine code.

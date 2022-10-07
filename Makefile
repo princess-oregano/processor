@@ -2,7 +2,9 @@ SRCDIR := src
 OBJDIR := obj
 
 SRC_ASM := asm.cpp text.cpp text2code.cpp 
-OBJ := $(addprefix $(OBJDIR)/, $(SRC_ASM:.cpp=.o))
+SRC_CPU := cpu.cpp process.cpp text.cpp stack.cpp error.cpp
+OBJ_ASM := $(addprefix $(OBJDIR)/, $(SRC_ASM:.cpp=.o))
+OBJ_CPU := $(addprefix $(OBJDIR)/, $(SRC_CPU:.cpp=.o))
 ASM := asm
 CPU := cpu
 
@@ -55,12 +57,13 @@ all: out run
 run:
 	printf "%s\n" "Running..."
 	./$(ASM) test.txt
+	./$(CPU) code.mur
 	printf "%s\n" "Finished."
 
-out: $(OBJDIR) $(OBJ)
+out: $(OBJDIR) $(OBJ_ASM) $(OBJ_CPU)
 	printf "%s\n" "Linking..."
-	$(CXX) $(OBJ) -o $(ASM) $(CXXFLAGS)
-#	$(CXX) $(OBJ) -o $(CPU) $(CXXFLAGS)
+	$(CXX) $(OBJ_ASM) -o $(ASM) $(CXXFLAGS)
+	$(CXX) $(OBJ_CPU) -o $(CPU) $(CXXFLAGS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	printf "%s\n" "Compiling $@..."

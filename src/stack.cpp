@@ -72,8 +72,6 @@ stack_ctor(stack_t *stack, unsigned int capacity, var_info_t var_info)
                  ON_CANARY(+ 2 * sizeof(unsigned long long));
         tmp_data_ptr = (char *) calloc(data_size, 1);
         
-        fprintf(stderr, "data_ptr = %p\n", tmp_data_ptr);
-
         if (tmp_data_ptr == nullptr) {
                 err.type.ERR_ALLOC = 1;
                 return err.val;
@@ -85,9 +83,6 @@ stack_ctor(stack_t *stack, unsigned int capacity, var_info_t var_info)
                &CANARY_VAL, sizeof(CANARY_VAL));
 #endif
 
-        fprintf(stderr, "stack address = %p\n", stack);
-        fprintf(stderr, "sizeof(stack) = %zx\n", sizeof(stack_t));
-
         stack->data = (elem_t *)(tmp_data_ptr ON_CANARY(+ sizeof(unsigned long long)));
 
         for (size_t i = 0; i < capacity; i++)
@@ -96,6 +91,7 @@ stack_ctor(stack_t *stack, unsigned int capacity, var_info_t var_info)
         stack->crc_hash = crc8(0, stack, sizeof(stack_t));
         stack->var_info = var_info;
 #endif
+        
         stack->capacity = capacity;
 
         return err.val;
