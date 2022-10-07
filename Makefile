@@ -54,7 +54,7 @@ all: out run
 
 run:
 	printf "%s\n" "Running..."
-	./$(ASM) src/text.txt
+	./$(ASM) text.txt
 	printf "%s\n" "Finished."
 
 out: $(OBJDIR) $(OBJ)
