@@ -2,7 +2,7 @@
 #include "error.h"
 
 void
-decypher_error(err_u err)
+decypher_error_stack(err_u err)
 {
         if (err.val == 0)
                 return;

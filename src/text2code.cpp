@@ -19,7 +19,7 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                 if (strcmp(cmd_name, "push") == 0) {
                         cmd_array[cmd_count++] = CMD_PUSH;
                         sscanf(text->lines[line_count].first_ch +
-                               MAX_CMD_SIZE, "%d", &val); 
+                               MAX_CMD_SIZE, "%d", &val);
                         cmd_array[cmd_count++] = val;
                 } else if (strcmp(cmd_name, "add") == 0) {
                         cmd_array[cmd_count++] = CMD_ADD;

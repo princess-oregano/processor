@@ -1,9 +1,8 @@
 #include <stdio.h>
-#include "asm.h"
 #include "text.h"
 #include "text2code.h"
 
-int 
+int
 main(int argc, char *argv[])
 {
         file_t src {};

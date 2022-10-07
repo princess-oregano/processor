@@ -21,7 +21,7 @@ int get_file(const char *filename, file_t *file, const char *mode)
         return ERR_NO_ERR;
 }
 
-int 
+int
 read_file(text_t *text, file_t *src)
 {
         assert(text);
@@ -91,7 +91,7 @@ int create_lines_arr(text_t *text)
         return ERR_NO_ERR;
 }
 
-int 
+int
 write_code(cmd_arr_t cmd_arr, file_t *dst)
 {
         size_t count = 0;
@@ -103,7 +103,7 @@ write_code(cmd_arr_t cmd_arr, file_t *dst)
         return ERR_NO_ERR;
 }
 
-void 
+void
 destroy_text(text_t *text, cmd_arr_t *cmd_arr)
 {
         assert(text);

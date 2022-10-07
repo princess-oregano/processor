@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-enum error_t {
+enum error_text_t {
         ERR_NO_ERR    = 0,
         ERR_OPEN_FILE = 1,
         ERR_STATS     = 2,
@@ -39,19 +39,19 @@ struct cmd_arr_t {
 };
 
 // Opens file and gets info about it.
-int 
+int
 get_file(const char *filename, file_t *file, const char *mode);
 // Creates and initializes buffer for storing text.
-int 
+int
 read_file(text_t *text, file_t *src);
 // Creates and initializes an array of line_t values.
-int 
+int
 create_lines_arr(text_t *text);
 // Frees allocated with malloc()/calloc()/realloc()/etc. space.
-void 
+void
 destroy_text(text_t *text, cmd_arr_t *cmd_arr);
 // Prints given text in stream.
-int 
+int
 write_code(cmd_arr_t cmd_arr, file_t *dst);
 
 #endif // TEXT_H

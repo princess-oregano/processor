@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-struct error_t {
+struct error_stack_t {
         bool ERR_ALLOC = 0;
         bool ERR_BAD_SIZE = 0;
         bool ERR_BAD_CAP = 0;
@@ -15,7 +15,7 @@ struct error_t {
 
 union err_u {
         long long val;
-        error_t type {};
+        error_stack_t type {};
 };
 
 // Prints all encountered errors stored in err variable.
