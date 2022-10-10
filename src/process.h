@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-void 
+void
 execute(int *cmd_buf, size_t size);
 
 #endif // PROCESS_H

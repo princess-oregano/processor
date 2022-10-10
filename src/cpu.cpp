@@ -11,12 +11,12 @@ main(int argc, char *argv[])
 
         get_file(argv[1], &src, "r");
 
-        int *cmd_buf = (int *) calloc(file_size, sizeof(int));
+        int *cmd_buf = (int *) calloc(src.file_stats.st_size, sizeof(int));
 
-        fread(cmd_buf, sizeof(int), file_size / sizeof(int),
+        fread(cmd_buf, sizeof(int), src.file_stats.st_size / sizeof(int),
               src.file_ptr);
 
-        execute(cmd_buf, file_size / sizeof(int));
+        execute(cmd_buf, src.file_stats.st_size / sizeof(int));
 
         free(cmd_buf);
 

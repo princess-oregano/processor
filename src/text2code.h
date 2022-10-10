@@ -14,6 +14,8 @@ enum cmd_t {
         CMD_MUL  = 4,
         CMD_DIV  = 5,
         CMD_OUT  = 6,
+        CMD_JMP  = 7,
+        CMD_DUP  = 8,
         CMD_DMP  = -1,
 };
 

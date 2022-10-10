@@ -29,11 +29,11 @@ data_resize(stack_t *stack, size_t capacity)
 
         char *data_ptr = (char *)stack->data ON_CANARY(- sizeof(unsigned long long));
 
-        size_t data_size = capacity * sizeof(elem_t) 
+        size_t data_size = capacity * sizeof(elem_t)
                  ON_CANARY(+ 2 * sizeof(unsigned long long));
         char *stk_data_ptr_tmp = (char *) realloc(data_ptr, data_size);
         fprintf(stderr, "data_ptr = %p\n", stk_data_ptr_tmp);
-        
+
         if (stk_data_ptr_tmp == nullptr) {
                 err.type.ERR_ALLOC = true;
                 return err.val;
@@ -71,7 +71,7 @@ stack_ctor(stack_t *stack, unsigned int capacity, var_info_t var_info)
         size_t data_size = capacity * sizeof(elem_t)
                  ON_CANARY(+ 2 * sizeof(unsigned long long));
         tmp_data_ptr = (char *) calloc(data_size, 1);
-        
+
         if (tmp_data_ptr == nullptr) {
                 err.type.ERR_ALLOC = 1;
                 return err.val;
@@ -91,7 +91,7 @@ stack_ctor(stack_t *stack, unsigned int capacity, var_info_t var_info)
         stack->crc_hash = crc8(0, stack, sizeof(stack_t));
         stack->var_info = var_info;
 #endif
-        
+
         stack->capacity = capacity;
 
         return err.val;
@@ -208,9 +208,9 @@ verify_stack(stack_t *stack)
             stack->right_canary != CANARY_VAL)
                err.type.ERR_STACK_CANARY = true;
 
-        if ((*(unsigned long long *)((char *) stack->data 
+        if ((*(unsigned long long *)((char *) stack->data
              - sizeof(unsigned long long))) != CANARY_VAL ||
-            (*(unsigned long long *)((char *) stack->data 
+            (*(unsigned long long *)((char *) stack->data
              + sizeof(elem_t)*stack->capacity)) != CANARY_VAL)
                 return err.type.ERR_DATA_CANARY = true;
 #endif
@@ -226,7 +226,7 @@ verify_stack(stack_t *stack)
                 stack->crc_hash = hash;
         }
 #endif
-        
+
         return err.val;
 }
 

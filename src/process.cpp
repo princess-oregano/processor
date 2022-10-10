@@ -24,7 +24,7 @@ static void cpu_dump(int *cmd_buf, size_t cmd_count, size_t ip)
         printf("^\n");
 }
 
-void 
+void
 execute(int *cmd_buf, size_t size)
 {
         int val1 = 0;
@@ -75,18 +75,20 @@ execute(int *cmd_buf, size_t size)
                         case CMD_OUT:
                                 cmd_count++;
                                 stack_pop(&stack, &val1);
-                                printf("%d\n", val1); 
+                                printf("%d\n", val1);
                                 break;
                         case CMD_DMP:
                                 cpu_dump(cmd_buf, size, cmd_count);
                                 cmd_count++;
                                 break;
+                        case CMD_JMP:
+                                
                         default:
                                 cmd_count++;
                                 assert(0 && "Invalid command.\n");
 
                 }
-                
+
                 cmd = cmd_buf[cmd_count];
         }
 
