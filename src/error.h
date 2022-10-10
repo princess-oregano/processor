@@ -19,7 +19,8 @@ union err_u {
 };
 
 // Prints all encountered errors stored in err variable.
-void decypher_error(err_u err);
+void
+decypher_error_stack(err_u err);
 
 #endif // ERROR_STACK_H
 

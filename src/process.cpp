@@ -4,21 +4,21 @@
 #include "process.h"
 #include "stack.h"
 
-static void cpu_dump(int *cmd_buf, int cmd_count, int ip)
+static void cpu_dump(int *cmd_buf, size_t cmd_count, size_t ip)
 {
         printf("CPU dump:\n");
 
-        for (int i = 0; i < cmd_count; i++)
-                printf("%02d ", i);
+        for (size_t i = 0; i < cmd_count; i++)
+                printf("%02zu ", i);
 
         printf("\n");
 
-        for (int i = 0; i < cmd_count; i++)
+        for (size_t i = 0; i < cmd_count; i++)
                 printf("%02d ", cmd_buf[i]);
 
         printf("\n");
 
-        for (int i = 0; i < ip; i++)
+        for (size_t i = 0; i < ip; i++)
                 printf("   ");
 
         printf("^\n");
@@ -37,7 +37,7 @@ execute(int *cmd_buf, size_t size)
         bool quit = false;
         while (cmd_count < size && !quit) {
 
-                int cmd = cmd = cmd_buf[cmd_count];
+                int cmd = cmd_buf[cmd_count];
                 switch (cmd) {
                         case CMD_PUSH:
                                 cmd_count++;

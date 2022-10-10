@@ -5,7 +5,8 @@
 #include <sys/mman.h>
 #include "text.h"
 
-int get_file(const char *filename, file_t *file, const char *mode)
+int
+get_file(const char *filename, file_t *file, const char *mode)
 {
         if ((file->file_ptr = fopen(filename, mode)) == nullptr) {
                 fprintf(stderr, "Error: Couldn't open %s.\n", filename);
@@ -42,7 +43,8 @@ read_file(text_t *text, file_t *src)
         return ERR_NO_ERR;
 }
 
-int create_lines_arr(text_t *text)
+int
+create_lines_arr(text_t *text)
 {
         assert(text);
 
@@ -94,8 +96,6 @@ int create_lines_arr(text_t *text)
 int
 write_code(cmd_arr_t cmd_arr, file_t *dst)
 {
-        size_t count = 0;
-
         setvbuf(dst->file_ptr, NULL, _IONBF, 0);
 
         fwrite(cmd_arr.cmd_array, sizeof(int), cmd_arr.cmd_count, dst->file_ptr);
