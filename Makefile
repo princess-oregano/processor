@@ -1,12 +1,18 @@
-SRCDIR := src
-OBJDIR := obj
-
-SRC_ASM := asm.cpp text.cpp text2code.cpp 
-SRC_CPU := cpu.cpp process.cpp text.cpp stack.cpp error.cpp
-OBJ_ASM := $(addprefix $(OBJDIR)/, $(SRC_ASM:.cpp=.o))
-OBJ_CPU := $(addprefix $(OBJDIR)/, $(SRC_CPU:.cpp=.o))
 ASM := asm
 CPU := cpu
+
+SRCDIR = src
+OBJDIR = obj
+
+SRCDIR_ASM := $(addprefix $(SRCDIR)/, $(ASM))
+SRCDIR_CPU := $(addprefix $(SRCDIR)/, $(CPU))
+OBJDIR_ASM := $(addprefix $(OBJDIR)/, $(ASM))
+OBJDIR_CPU := $(addprefix $(OBJDIR)/, $(CPU))
+
+SRC_ASM := main.cpp text.cpp text2code.cpp 
+SRC_CPU := main.cpp process.cpp file.cpp stack.cpp error.cpp
+OBJ_ASM := $(addprefix $(OBJDIR_ASM)/, $(SRC_ASM:.cpp=.o))
+OBJ_CPU := $(addprefix $(OBJDIR_CPU)/, $(SRC_CPU:.cpp=.o))
 
 CXX := g++
 CXXFLAGS := -O3 -g -std=c++14 -fmax-errors=100 -Wall -Wextra                  \
@@ -28,29 +34,17 @@ CXXFLAGS := -O3 -g -std=c++14 -fmax-errors=100 -Wall -Wextra                  \
 	    -Wno-old-style-cast -Wno-varargs -fcheck-new                      \
 	    -fsized-deallocation -fstack-check -fstack-protector              \
 	    -fstrict-overflow -flto-odr-type-merging                          \
-	    -fno-omit-frame-pointer                                           \
-	    -fsanitize=alignment                                              \
-            -fsanitize=address                                                \
-            -fsanitize=bool                                                   \
-	    -fsanitize=bounds                                                 \
-	    -fsanitize=enum                                                   \
-	    -fsanitize=float-cast-overflow                                    \
+	    -fno-omit-frame-pointer -fsanitize=alignment                      \
+            -fsanitize=address -fsanitize=bool -fsanitize=bounds              \
+	    -fsanitize=enum -fsanitize=float-cast-overflow                    \
 	    -fsanitize=float-divide-by-zero                                   \
-	    -fsanitize=integer-divide-by-zero                                 \
-	    -fsanitize=leak                                                   \
-	    -fsanitize=nonnull-attribute                                      \
-	    -fsanitize=null                                                   \
-	    -fsanitize=object-size                                            \
-	    -fsanitize=return                                                 \
-	    -fsanitize=returns-nonnull-attribute                              \
-	    -fsanitize=shift                                                  \
+	    -fsanitize=integer-divide-by-zero -fsanitize=leak                 \
+	    -fsanitize=nonnull-attribute -fsanitize=null                      \
+	    -fsanitize=object-size -fsanitize=return                          \
+	    -fsanitize=returns-nonnull-attribute -fsanitize=shift             \
 	    -fsanitize=signed-integer-overflow                                \
-	    -fsanitize=undefined                                              \
-	    -fsanitize=unreachable                                            \
-	    -fsanitize=vla-bound                                              \
-	    -fsanitize=vptr                                                   \
-	    -fPIE                                                             \
-	    -lm -pie
+	    -fsanitize=undefined -fsanitize=unreachable                       \
+	    -fsanitize=vla-bound -fsanitize=vptr -fPIE -lm -pie
 .SILENT:
 all: out run
 
@@ -66,13 +60,19 @@ out: $(OBJDIR) $(OBJ_ASM) $(OBJ_CPU)
 	$(CXX) $(OBJ_ASM) -o $(ASM) $(CXXFLAGS)
 	$(CXX) $(OBJ_CPU) -o $(CPU) $(CXXFLAGS)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+$(OBJDIR_ASM)/%.o: $(SRCDIR_ASM)/%.cpp
+	printf "%s\n" "Compiling $@..."
+	$(CXX) -c $^ -o  $@ $(CXXFLAGS)
+
+$(OBJDIR_CPU)/%.o: $(SRCDIR_CPU)/%.cpp
 	printf "%s\n" "Compiling $@..."
 	$(CXX) -c $^ -o  $@ $(CXXFLAGS)
 
 $(OBJDIR):
 	printf "%s\n" "Making $@/ directory..."
 	mkdir $@
+	mkdir $(OBJDIR_ASM)
+	mkdir $(OBJDIR_CPU)
 
 clean:
 	printf "%s\n" "Removing $(OBJDIR)/ directory..."

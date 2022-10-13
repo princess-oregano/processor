@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "text2code.h"
+#include "../include/text2code.h"
 
 void
 text2code(text_t *text, cmd_arr_t *cmd_arr)

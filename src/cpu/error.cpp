@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "error.h"
+#include "../include/error.h"
 
 void
 decypher_error_stack(err_u err)

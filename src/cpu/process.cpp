@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
-#include "text2code.h"
-#include "process.h"
-#include "stack.h"
+#include "../include/text2code.h"
+#include "../include/process.h"
+#include "../include/stack.h"
 
 static void cpu_dump(int *cmd_buf, size_t cmd_count, size_t ip)
 {
