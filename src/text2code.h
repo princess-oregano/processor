@@ -6,16 +6,23 @@
 
 const size_t MAX_CMD_SIZE = 5;
 
+const int RAM_MASK = 0x80;
+const int REG_MASK = 0x40;
+const int IMMED_MASK = 0x20;
+const int CMD_MASK = 0x1F;
+
 enum cmd_t {
         CMD_HLT  = 0,
         CMD_PUSH = 1,
-        CMD_ADD  = 2,
-        CMD_SUB  = 3,
-        CMD_MUL  = 4,
-        CMD_DIV  = 5,
-        CMD_OUT  = 6,
-        CMD_JMP  = 7,
-        CMD_DUP  = 8,
+        CMD_POP  = 2,
+        CMD_ADD  = 3,
+        CMD_SUB  = 4,
+        CMD_MUL  = 5,
+        CMD_DIV  = 6,
+        CMD_OUT  = 7,
+        CMD_JMP  = 8,
+        CMD_DUP  = 9,
+        CMD_IN   = 10,
         CMD_DMP  = -1,
 };
 

@@ -55,9 +55,10 @@ CXXFLAGS := -O3 -g -std=c++14 -fmax-errors=100 -Wall -Wextra                  \
 all: out run
 
 run:
-	printf "%s\n" "Running..."
+	printf "%s\n" "Assembling..."
 	./$(ASM) test.txt
-	./$(CPU) code.mur
+	printf "%s\n" "Running..."
+	./$(CPU) test.mur
 	printf "%s\n" "Finished."
 
 out: $(OBJDIR) $(OBJ_ASM) $(OBJ_CPU)
@@ -81,6 +82,7 @@ clean:
 distclean:
 	printf "%s\n" "Removing built files..."
 	rm -rf $(OBJDIR)
-	rm $(TARGET)
+	rm $(ASM)
+	rm $(CPU)
 	printf "%s\n" "Done."
 

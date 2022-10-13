@@ -1,11 +1,13 @@
-push 10
-push 20
-add
 push 1
-push 2
-dmp
-add
-div
+pop rax
+push rax
+push rax
+mul
 out
-hlt
+push rax
+push 1
+add
+pop rax
+dmp
+jmp 4
 
