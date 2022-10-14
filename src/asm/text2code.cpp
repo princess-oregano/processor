@@ -16,10 +16,7 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
         size_t line_count = 0;
        
         int cycle_count = 0;
-        while (cycle_count < 2) {
-        line_count = 0;
-        ip = 0;
-        while (line_count < text->num_of_lines) {
+        while (cycle_count < 2 && line_count < text->num_of_lines) {
                 sscanf(text->lines[line_count].first_ch, "%s", cmd_name);
 
                 if (strcasecmp(cmd_name, "PUSH") == 0) {
@@ -54,18 +51,6 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                                 cmd_array[ip++] = CMD_POP | REG_MASK | RAM_MASK;
                                 cmd_array[ip++] = str_val[1] - 'a';
                         }
-                } else if (strcasecmp(cmd_name, "ADD") == 0) {
-                        cmd_array[ip++] = CMD_ADD;
-                } else if (strcasecmp(cmd_name, "SUB") == 0) {
-                        cmd_array[ip++] = CMD_SUB;
-                } else if (strcasecmp(cmd_name, "MUL") == 0) {
-                        cmd_array[ip++] = CMD_MUL;
-                } else if (strcasecmp(cmd_name, "DIV") == 0) {
-                        cmd_array[ip++] = CMD_DIV;
-                } else if (strcasecmp(cmd_name, "OUT") == 0) {
-                        cmd_array[ip++] = CMD_OUT;
-                } else if (strcasecmp(cmd_name, "DMP") == 0) {
-                        cmd_array[ip++] = CMD_DMP;
                 } else if (strcasecmp(cmd_name, "JMP") == 0) {
                         cmd_array[ip++] = CMD_JMP;
                         if (sscanf(text->lines[line_count].first_ch +
@@ -81,6 +66,18 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                                         }
                                 }
                         }
+                } else if (strcasecmp(cmd_name, "ADD") == 0) {
+                        cmd_array[ip++] = CMD_ADD;
+                } else if (strcasecmp(cmd_name, "SUB") == 0) {
+                        cmd_array[ip++] = CMD_SUB;
+                } else if (strcasecmp(cmd_name, "MUL") == 0) {
+                        cmd_array[ip++] = CMD_MUL;
+                } else if (strcasecmp(cmd_name, "DIV") == 0) {
+                        cmd_array[ip++] = CMD_DIV;
+                } else if (strcasecmp(cmd_name, "OUT") == 0) {
+                        cmd_array[ip++] = CMD_OUT;
+                } else if (strcasecmp(cmd_name, "DMP") == 0) {
+                        cmd_array[ip++] = CMD_DMP;
                 } else if (strcasecmp(cmd_name, "DUP") == 0) {
                         cmd_array[ip++] = CMD_DUP;
                 } else if (strcasecmp(cmd_name, "IN") == 0) {
@@ -96,8 +93,11 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                 }
 
                 line_count++;
-        }
-        cycle_count++;
+                if (line_count == text->num_of_lines && cycle_count < 1) {
+                        cycle_count++;
+                        line_count = 0;
+                        ip = 0;
+                }
         }
 
         cmd_arr->cmd_array = cmd_array;
