@@ -17,60 +17,60 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
         while (line_count < text->num_of_lines) {
                 sscanf(text->lines[line_count].first_ch, "%s", cmd_name);
 
-                if (strcmp(cmd_name, "push") == 0) {
+                if (strcasecmp(cmd_name, "PUSH") == 0) {
                         if (sscanf(text->lines[line_count].first_ch +
-                            strlen("push"), "%d", &val) == 1) {
+                            strlen("PUSH"), "%d", &val) == 1) {
                                 cmd_array[ip++] = CMD_PUSH | IMMED_MASK;
                                 cmd_array[ip++] = val;
                         } else if (sscanf(text->lines[line_count].first_ch +
-                                strlen("push"), "[%d]", &val) == 1) {
+                                strlen("PUSH"), "[%d]", &val) == 1) {
                                 cmd_array[ip++] = CMD_PUSH | RAM_MASK | IMMED_MASK;
                                 cmd_array[ip++] = val;
                         } else if (sscanf(text->lines[line_count].first_ch +
-                                strlen("push"), "%s", str_val) == 1) {
+                                strlen("PUSH"), "%s", str_val) == 1) {
                                 cmd_array[ip++] = CMD_PUSH | REG_MASK;
                                 cmd_array[ip++] = str_val[1] - 'a' + 1;
                         } else if (sscanf(text->lines[line_count].first_ch +
-                                strlen("push"), "[%s]", str_val) == 1) {
+                                strlen("PUSH"), "[%s]", str_val) == 1) {
                                 cmd_array[ip++] = CMD_PUSH | REG_MASK | RAM_MASK;
                                 cmd_array[ip++] = str_val[1] - 'a' + 1;
                         }
-                } else if (strcmp(cmd_name, "pop") == 0) {
+                } else if (strcasecmp(cmd_name, "POP") == 0) {
                         if (sscanf(text->lines[line_count].first_ch +
-                                strlen("pop"), "[%d]", &val) == 1) {
+                                strlen("POP"), "[%d]", &val) == 1) {
                                 cmd_array[ip++] = CMD_POP | RAM_MASK | IMMED_MASK;
                                 cmd_array[ip++] = val;
                         } else if (sscanf(text->lines[line_count].first_ch +
-                                strlen("pop"), "%s", str_val) == 1) {
+                                strlen("POP"), "%s", str_val) == 1) {
                                 cmd_array[ip++] = CMD_POP | REG_MASK;
                                 cmd_array[ip++] = str_val[1] - 'a' + 1;
                         } else if (sscanf(text->lines[line_count].first_ch +
-                                strlen("pop"), "[%s]", str_val) == 1) {
+                                strlen("POP"), "[%s]", str_val) == 1) {
                                 cmd_array[ip++] = CMD_POP | REG_MASK | RAM_MASK;
                                 cmd_array[ip++] = str_val[1] - 'a';
                         }
-                } else if (strcmp(cmd_name, "add") == 0) {
+                } else if (strcasecmp(cmd_name, "ADD") == 0) {
                         cmd_array[ip++] = CMD_ADD;
-                } else if (strcmp(cmd_name, "sub") == 0) {
+                } else if (strcasecmp(cmd_name, "SUB") == 0) {
                         cmd_array[ip++] = CMD_SUB;
-                } else if (strcmp(cmd_name, "mul") == 0) {
+                } else if (strcasecmp(cmd_name, "MUL") == 0) {
                         cmd_array[ip++] = CMD_MUL;
-                } else if (strcmp(cmd_name, "div") == 0) {
+                } else if (strcasecmp(cmd_name, "DIV") == 0) {
                         cmd_array[ip++] = CMD_DIV;
-                } else if (strcmp(cmd_name, "out") == 0) {
+                } else if (strcasecmp(cmd_name, "OUT") == 0) {
                         cmd_array[ip++] = CMD_OUT;
-                } else if (strcmp(cmd_name, "dmp") == 0) {
+                } else if (strcasecmp(cmd_name, "DMP") == 0) {
                         cmd_array[ip++] = CMD_DMP;
-                } else if (strcmp(cmd_name, "jmp") == 0) {
+                } else if (strcasecmp(cmd_name, "JMP") == 0) {
                         cmd_array[ip++] = CMD_JMP;
                         sscanf(text->lines[line_count].first_ch +
-                               strlen("jmp"), "%d", &val);
+                               strlen("JMP"), "%d", &val);
                         cmd_array[ip++] = val;
-                } else if (strcmp(cmd_name, "dup") == 0) {
+                } else if (strcasecmp(cmd_name, "DUP") == 0) {
                         cmd_array[ip++] = CMD_DUP;
-                } else if (strcmp(cmd_name, "in") == 0) {
+                } else if (strcasecmp(cmd_name, "IN") == 0) {
                         cmd_array[ip++] = CMD_IN;
-                } else if (strcmp(cmd_name, "hlt") == 0) {
+                } else if (strcasecmp(cmd_name, "HLT") == 0) {
                         cmd_array[ip++] = CMD_HLT;
                 } else { 
                         fprintf(stderr, "Error: Couldn't find command '%s'\n", cmd_name);
