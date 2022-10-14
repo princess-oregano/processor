@@ -3,7 +3,7 @@
 #include "../include/text.h"
 #include "../include/text2code.h"
 
-const char *file_extension = ".mur";
+const char *FILE_EXT = ".mur";
 
 int
 main(int argc, char *argv[])
@@ -16,14 +16,7 @@ main(int argc, char *argv[])
                 text_t text {};
                 cmd_arr_t cmd_arr {};
 
-                char *c = strrchr(argv[file_count], '.');
-                size_t c_len = (size_t) (c - argv[file_count]) + strlen(file_extension);
-                char dst_filename[c_len + 1];
-
-                strncpy(dst_filename, argv[file_count], c_len - strlen(file_extension));
-                dst_filename[c_len - strlen(file_extension)] = '\0';
-                fprintf(stderr, "dst_filename = %s\n", dst_filename);
-                strncat(dst_filename, file_extension, strlen(file_extension));
+                char *dst_filename = change_ext(argv[file_count], FILE_EXT);
 
                 if ((get_file(argv[file_count], &src, "r") == ERR_STATS) ||
                     (get_file(dst_filename, &dst, "w") == ERR_STATS))
@@ -42,7 +35,7 @@ main(int argc, char *argv[])
                 if (write_code(cmd_arr, &dst) == ERR_ALLOC)
                         return ERR_ALLOC;
 
-                destroy_text(&text, &cmd_arr);
+                destroy_text(&text, &cmd_arr, dst_filename);
 
                 fclose(dst.file_ptr);
         }

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <ctype.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include "../include/text.h"
@@ -111,7 +112,7 @@ write_code(cmd_arr_t cmd_arr, file_t *dst)
 }
 
 void
-destroy_text(text_t *text, cmd_arr_t *cmd_arr)
+destroy_text(text_t *text, cmd_arr_t *cmd_arr, char *dst_name)
 {
         assert(text);
 
@@ -121,5 +122,21 @@ destroy_text(text_t *text, cmd_arr_t *cmd_arr)
                 free(cmd_arr->cmd_array);
         if (text->buffer != nullptr)
                 munmap(text->buffer, text->buf_size);
+        if (dst_name != nullptr)
+                free(dst_name);
+}
+
+char *change_ext(char *src_filename, const char *ext)
+{
+        char *c = strrchr(src_filename, '.');
+        size_t c_len = (size_t) (c - src_filename) + strlen(ext);
+        char *dst_filename = (char *) calloc (c_len + 1, sizeof(char));
+
+        strncpy(dst_filename, src_filename, c_len - strlen(ext));
+        dst_filename[c_len - strlen(ext)] = '\0';
+        fprintf(stderr, "dst_filename = %s\n", dst_filename);
+        strncat(dst_filename, ext, strlen(ext));
+
+        return dst_filename;
 }
 

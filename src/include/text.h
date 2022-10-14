@@ -49,10 +49,12 @@ int
 create_lines_arr(text_t *text);
 // Frees allocated with malloc()/calloc()/realloc()/etc. space.
 void
-destroy_text(text_t *text, cmd_arr_t *cmd_arr);
+destroy_text(text_t *text, cmd_arr_t *cmd_arr, char *dst_name);
 // Prints given text in stream.
 int
 write_code(cmd_arr_t cmd_arr, file_t *dst);
+// Changes file extention.
+char *change_ext(char *src_filename, const char *ext);
 
 #endif // TEXT_H
 
