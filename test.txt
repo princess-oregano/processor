@@ -1,5 +1,6 @@
 push 1
 pop rax
+;comment?
 push rax
 push rax
 mul

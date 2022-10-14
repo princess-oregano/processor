@@ -74,6 +74,13 @@ create_lines_arr(text_t *text)
                         i++;
 
                 if (ch != '\n' && ch != '\0') {
+                        if (ch == ';') {
+                                while (ch != '\n' && ch != '\0') {
+                                        i++;
+                                        ch = text->buffer[i];
+                                }
+                                continue;
+                        }
                         lines_array[index].first_ch = &text->buffer[i];
 
                         while (ch != '\n' && ch != '\0') {

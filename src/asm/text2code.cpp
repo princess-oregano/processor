@@ -72,6 +72,8 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                         cmd_array[ip++] = CMD_IN;
                 } else if (strcmp(cmd_name, "hlt") == 0) {
                         cmd_array[ip++] = CMD_HLT;
+                } else { 
+                        fprintf(stderr, "Error: Couldn't find command '%s'\n", cmd_name);
                 }
 
                 line_count++;

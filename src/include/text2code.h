@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "text.h"
 
-const size_t MAX_CMD_SIZE = 5;
+const size_t MAX_CMD_SIZE = 40;
 
 const int RAM_MASK = 0x80;
 const int REG_MASK = 0x40;
