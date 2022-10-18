@@ -99,25 +99,23 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                                 find_label(labels, label_count, str_val);
 
                         }
-                } else if (strcasecmp(cmd_name, "ADD") == 0) {
-                        cmd_array[ip++] = CMD_ADD;
-                } else if (strcasecmp(cmd_name, "SUB") == 0) {
-                        cmd_array[ip++] = CMD_SUB;
-                } else if (strcasecmp(cmd_name, "MUL") == 0) {
-                        cmd_array[ip++] = CMD_MUL;
-                } else if (strcasecmp(cmd_name, "DIV") == 0) {
-                        cmd_array[ip++] = CMD_DIV;
-                } else if (strcasecmp(cmd_name, "OUT") == 0) {
-                        cmd_array[ip++] = CMD_OUT;
-                } else if (strcasecmp(cmd_name, "DMP") == 0) {
-                        cmd_array[ip++] = CMD_DMP;
-                } else if (strcasecmp(cmd_name, "DUP") == 0) {
-                        cmd_array[ip++] = CMD_DUP;
-                } else if (strcasecmp(cmd_name, "IN") == 0) {
-                        cmd_array[ip++] = CMD_IN;
-                } else if (strcasecmp(cmd_name, "HLT") == 0) {
-                        cmd_array[ip++] = CMD_HLT;
-                } else {
+                } else if (strcasecmp(cmd_name, "SQRT") == 0) {
+                        cmd_array[ip++] = CMD_SQRT;
+                        if (sscanf(text->lines[line_count].first_ch +
+                        strlen("SQRT"), "%d", &val) == 1) {
+                                cmd_array[ip++] = val;
+                        }
+                } else 
+                CMD(ADD) 
+                CMD(SUB) 
+                CMD(MUL)
+                CMD(DIV)
+                CMD(OUT)
+                CMD(DMP)
+                CMD(DUP)
+                CMD(IN)
+                CMD(HLT) 
+                { 
                         if (cycle_count > 0 && 
                             find_label(labels, label_count, cmd_name) == -1) {
                                 fprintf(stderr, "Error: Couldn't find "

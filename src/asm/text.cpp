@@ -126,7 +126,8 @@ destroy_text(text_t *text, cmd_arr_t *cmd_arr, char *dst_name)
                 free(dst_name);
 }
 
-char *change_ext(char *src_filename, const char *ext)
+char *
+change_ext(char *src_filename, const char *ext)
 {
         char *c = strrchr(src_filename, '.');
         size_t c_len = (size_t) (c - src_filename) + strlen(ext);

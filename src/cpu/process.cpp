@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
+#include <math.h>
 #include "../include/text2code.h"
 #include "../include/process.h"
 #include "../include/stack.h"
@@ -38,84 +39,35 @@ execute(int *cmd_buf, size_t size)
 
         stack_ctor(&stack, DEF_STACK_CAPACITY, VAR_INFO(stack));
 
-        bool quit = false;
-        while (ip < size && !quit) {
+        bool halt = false;
+        while (ip < size && !halt) {
                 sleep(1);
                 int cmd = cmd_buf[ip];
                 switch (cmd & CMD_MASK) {
-                        case CMD_PUSH:
-                                ip++;
-                                if ((cmd & (RAM_MASK | IMMED_MASK)) == (RAM_MASK | IMMED_MASK))
-                                        stack_push(&stack, ram[cmd_buf[ip]]);
-                                else if ((cmd & (REG_MASK | RAM_MASK)) == (REG_MASK | RAM_MASK))
-                                        stack_push(&stack, ram[reg[ip]]);
-                                else if ((cmd & IMMED_MASK) == IMMED_MASK)
-                                        stack_push(&stack, cmd_buf[ip]);
-                                else if ((cmd & REG_MASK) == REG_MASK)
-                                        stack_push(&stack, reg[cmd_buf[ip]]);
-                                ip++;
-                                break;
-                        case CMD_POP:
-                                ip++;
-                                if ((cmd & (RAM_MASK | IMMED_MASK)) == (RAM_MASK | IMMED_MASK))
-                                        stack_pop(&stack, &ram[cmd_buf[ip]]);
-                                else if ((cmd & (REG_MASK | RAM_MASK)) == (REG_MASK | RAM_MASK))
-                                        stack_pop(&stack, &ram[reg[ip]]);
-                                else if ((cmd & REG_MASK) == REG_MASK)
-                                        stack_pop(&stack, &reg[cmd_buf[ip]]);
-                                ip++;
-                                break;
-                        case CMD_HLT:
-                                ip++;
-                                quit = true;
-                                break;
-                        case CMD_ADD:
-                                ip++;
-                                stack_pop(&stack, &val1);
-                                stack_pop(&stack, &val2);
-                                stack_push(&stack, val1 + val2);
-                                break;
-                        case CMD_SUB:
-                                ip++;
-                                stack_pop(&stack, &val1);
-                                stack_pop(&stack, &val2);
-                                stack_push(&stack, val1 - val2);
-                                break;
-                        case CMD_MUL:
-                                ip++;
-                                stack_pop(&stack, &val1);
-                                stack_pop(&stack, &val2);
-                                stack_push(&stack, val1 * val2);
-                                break;
-                        case CMD_DIV:
-                                ip++;
-                                stack_pop(&stack, &val1);
-                                stack_pop(&stack, &val2);
-                                stack_push(&stack, val2 / val1);
-                                break;
-                        case CMD_OUT:
-                                ip++;
-                                stack_pop(&stack, &val1);
-                                printf("%d\n", val1);
-                                break;
-                        case (CMD_DMP & CMD_MASK):
-                                cpu_dump(cmd_buf, size, ip);
-                                ip++;
-                                break;
-                        case CMD_JMP:
-                                ip++;
-                                ip = cmd_buf[ip];
-                                break;
-                        case CMD_DUP:
-                                stack_pop(&stack, &val1);
-                                stack_push(&stack, val1);
-                                stack_push(&stack, val1);
-                                ip++;
-                                break;
-                        case CMD_IN:
-                                scanf("%d", &val1);
-                                stack_push(&stack, val1);
-                                break;
+                        DEF_CMD(PUSH, 
+                                IF_PUSH(RAM_MASK | IMMED_MASK, ram[cmd_buf[ip]])
+                                IF_PUSH(REG_MASK | RAM_MASK, ram[reg[ip]])
+                                IF_PUSH(IMMED_MASK, cmd_buf[ip])
+                                IF_PUSH(REG_MASK, reg[cmd_buf[ip]])
+                                        assert(0 && "Invalid PUSH command.\n");
+                               )
+                        DEF_CMD(POP,
+                                IF_POP((RAM_MASK | IMMED_MASK), ram[cmd_buf[ip]])
+                                IF_POP((REG_MASK | RAM_MASK), ram[reg[ip]])
+                                IF_POP((REG_MASK), reg[cmd_buf[ip]])
+                                        assert(0 && "Invalid POP command.\n");
+                               )
+                        DEF_CMD(HLT, halt = true;)
+                        DEF_CMD(ADD, POP(val1) POP(val2) PUSH(val1 + val2))
+                        DEF_CMD(SUB, POP(val1) POP(val2) PUSH(val1 - val2))
+                        DEF_CMD(MUL, POP(val1) POP(val2) PUSH(val1 * val2))
+                        DEF_CMD(DIV, POP(val1) POP(val2) PUSH(val2 / val1))
+                        DEF_CMD(DUP, POP(val1) PUSH(val1) PUSH(val2))
+                        DEF_CMD(OUT, POP(val1) printf("%d\n", val1);)
+                        DEF_CMD(JMP, ip = cmd_buf[ip];)
+                        DEF_CMD(IN, scanf("%d", &val1); PUSH(val1))
+                        DEF_CMD(SQRT, val1 = (int) sqrt(val1); PUSH(val1))
+                        DEF_CMD(DMP & CMD_MASK, cpu_dump(cmd_buf, size, ip);)
                         default:
                                 ip++;
                                 assert(0 && "Invalid command.\n");
