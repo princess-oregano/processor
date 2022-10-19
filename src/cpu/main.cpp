@@ -6,20 +6,24 @@
 int
 main(int argc, char *argv[])
 {
-        file_t src {};
+        size_t num_of_files = (size_t) argc;
 
-        get_file(argv[1], &src, "r");
+        for (size_t file_count = 1; file_count < num_of_files; file_count++) {
+                file_t src {};
 
-        size_t file_size = (size_t) src.file_stats.st_size;
+                get_file(argv[file_count], &src, "r");
 
-        int *cmd_buf = (int *) calloc(file_size, sizeof(int));
+                size_t file_size = (size_t) src.file_stats.st_size;
 
-        fread(cmd_buf, sizeof(int), file_size / sizeof(int),
-              src.file_ptr);
+                int *cmd_buf = (int *) calloc(file_size, sizeof(int));
 
-        execute(cmd_buf, file_size / sizeof(int));
+                fread(cmd_buf, sizeof(int), file_size / sizeof(int),
+                      src.file_ptr);
 
-        free(cmd_buf);
+                execute(cmd_buf, file_size / sizeof(int));
+
+                free(cmd_buf);
+        }
 
         return 0;
 }

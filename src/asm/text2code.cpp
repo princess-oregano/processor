@@ -8,8 +8,15 @@
 static int
 find_func(func_t *funcs, size_t size, char *str)
 {
+        char func[FUNC_SIZE] = "";
+        size_t len = strlen(str);
+
+        if (str[len-1] == ':')
+                len--;
+
+        memcpy(func, str, len);
         for (size_t i = 0; i < size; i++) {
-                if (strcasecmp(funcs[i].name, str) == 0) {
+                if (strcmp(funcs[i].name, func) == 0) {
                         return (int) funcs[i].ip;
                 }
         }
@@ -22,7 +29,7 @@ static void
 make_func(func_t *funcs, size_t ip, size_t *size, char *str)
 {
         funcs[*size].ip = ip;
-        strcpy(funcs[*size].name, str);
+        memcpy(funcs[*size].name, str, strlen(str));
 
         *size += 1;
 }
@@ -131,13 +138,13 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                         cmd_array[ip++] = CMD_JMP;
 
                         if (sscanf(text->lines[line_count].first_ch +
-                        strlen("JMP"), " %c%d", &c, &val) == 2) {
-                                if (c == ':')
-                                        cmd_array[ip++] = val;
+                        strlen("JMP"), " %c%d", &c, &val) == 2
+                        && c == ':') {
+                                cmd_array[ip++] = val;
                         } else if (sscanf(text->lines[line_count].first_ch +
-                        strlen("JMP"), " %c%s", &c, str_val) == 2) {
-                                if (c == ':')
-                                        cmd_array[ip++] =
+                        strlen("JMP"), " %c%s", &c, str_val) == 2
+                        && c == ':') {
+                                cmd_array[ip++] =
                                 find_label(labels, label_count, str_val);
                         }
                 } else if(strcasecmp(cmd_name, "CALL") == 0) {
@@ -145,12 +152,12 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
 
                         if (sscanf(text->lines[line_count].first_ch +
                         strlen("CALL"), "%s", str_val) == 1) {
-                                cmd_array[ip++] = (size_t)
+                                cmd_array[ip++] =
                                 find_func(funcs, func_count, str_val);
                         }
                 } else if(strcasecmp(cmd_name, "RET") == 0) {
                         cmd_array[ip++] = CMD_RET;
-                        cmd_array[ip++] = funcs[func_count].ip;
+                        cmd_array[ip++] = (int) funcs[func_count].ip;
                         func_count--;
                 } else if (strcasecmp(cmd_name, "SQRT") == 0) {
                         cmd_array[ip++] = CMD_SQRT;
