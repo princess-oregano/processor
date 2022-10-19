@@ -9,18 +9,25 @@
                   } else   
 
 const size_t MAX_CMD_SIZE = 40;
-const int LABEL_SIZE = 40;
 const int LABELS_NUM = 50;
+const int LABEL_SIZE = 40;
+const int  FUNCS_NUM = 50;
+const int  FUNC_SIZE = 40;
 
-const int RAM_MASK = 0x80;
-const int REG_MASK = 0x40;
+const int RAM_MASK   = 0x80;
+const int REG_MASK   = 0x40;
 const int IMMED_MASK = 0x20;
-const int CMD_MASK = 0x1F;
+const int CMD_MASK   = 0x1F;
 
 struct label_t {
-        size_t ip = 0;
+        size_t ip = 4;
         size_t n_label = 0;
         char name[LABEL_SIZE] = "";
+};
+
+struct func_t {
+        size_t ip = 0;
+        char name[FUNC_SIZE] = "";
 };
 
 enum cmd_t {

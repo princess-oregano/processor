@@ -1,6 +1,6 @@
 push 1
 pop rax
-next ;jmp label
+next:
 push rax
 push rax
 mul
@@ -10,5 +10,5 @@ push 1
 add
 pop rax
 dmp
-jmp next
+jmp :next
 

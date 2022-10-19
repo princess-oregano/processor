@@ -2,12 +2,47 @@
 #include <string.h>
 #include "../include/text2code.h"
 
+//////////////////////FUNCTIONS/////////////////////
+
+static int
+find_func(func_t *funcs, size_t size, char *str)
+{
+        for (size_t i = 0; i < size; i++) {
+                if (strcasecmp(funcs[i].name, str) == 0) {
+                        return (int) funcs[i].ip;
+                }
+        }
+
+        return -1;
+}
+
+static void
+make_func(func_t *funcs, size_t ip, size_t *size, char *str)
+{
+        funcs[*size].ip = ip;
+        strcpy(funcs[*size].name, str);
+
+        *size += 1;
+}
+
+////////////////////////////////////////////////////
+
+///////////////////////LABELS///////////////////////
+
 // Finds label in the array.
 static int
 find_label(label_t *labels, size_t size, char *str)
 {
+        char label[LABEL_SIZE] = "";
+        size_t len = strlen(str);
+
+        if (str[len-1] == ':')
+                len--;
+
+        strncpy(label, str, len);
         for (size_t i = 0; i < size; i++) {
-                if (strcasecmp(labels[i].name, str) == 0) {
+                fprintf(stderr, "%s %s\n", labels[i].name, label);
+                if (strcmp(labels[i].name, label) == 0) {
                         return (int) labels[i].ip;
                 }
         }
@@ -16,15 +51,41 @@ find_label(label_t *labels, size_t size, char *str)
 }
 
 // Creates label.
-static void
+static bool
 make_label(label_t *labels, size_t ip, size_t *size, char *str)
 {
+        size_t len = strlen(str) - 1;
+
+        if (str[len] != ':')
+                return false;
+
+        len = (len < LABEL_SIZE) ? len : LABEL_SIZE;
+
         labels[*size].n_label = *size;
         labels[*size].ip = ip;
-        strcpy(labels[*size].name, str);
+        strncpy(labels[*size].name, str, len);
 
         *size += 1;
+
+        return true;
 }
+
+// Dumps all info about labels.
+static void
+label_dump(label_t *labels, size_t size)
+{
+        for (size_t i = 0; i < size; i++) {
+                fprintf(stderr, "Label %zu:\n"
+                                "Name '%s'\n"
+                                "IP '%zu'\n", labels[i].n_label, 
+                                              labels[i].name,
+                                              labels[i].ip);
+
+                fprintf(stderr, "\n");
+        }
+}
+
+////////////////////////////////////////////////////
 
 void
 text2code(text_t *text, cmd_arr_t *cmd_arr)
@@ -33,11 +94,14 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
 
         char cmd_name[MAX_CMD_SIZE] = {};
         label_t labels[LABELS_NUM] = {};
+        func_t  funcs [FUNCS_NUM]  = {};
         size_t ip = 0;
-        size_t label_count = 0;
         size_t  line_count = 0;
+        size_t  func_count = 0;
+        size_t label_count = 0;
         char str_val[40] = {};
         int val = 0;
+        char c = 0;
 
         int cycle_count = 0;
         while (cycle_count < 2 && line_count < text->num_of_lines) {
@@ -90,14 +154,15 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                         cmd_array[ip++] = CMD_JMP;
 
                         if (sscanf(text->lines[line_count].first_ch +
-                        strlen("JMP"), "%d", &val) == 1) {
-                                fprintf(stderr, "val = %d\n", val);
-                                cmd_array[ip++] = val;
+                        strlen("JMP"), " %c%d", &c, &val) == 2) {
+                                if (c == ':')
+                                        cmd_array[ip++] = val;
                         } else if (sscanf(text->lines[line_count].first_ch +
-                        strlen("JMP"), "%s", str_val) == 1) {
-                                cmd_array[ip++] = 
+                        strlen("JMP"), " %c%s", &c, str_val) == 2) {
+                                if (c == ':') 
+                                        cmd_array[ip++] = 
                                 find_label(labels, label_count, str_val);
-
+                                label_dump(labels, label_count);
                         }
                 } else if (strcasecmp(cmd_name, "SQRT") == 0) {
                         cmd_array[ip++] = CMD_SQRT;
@@ -105,7 +170,21 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                         strlen("SQRT"), "%d", &val) == 1) {
                                 cmd_array[ip++] = val;
                         }
-                } else 
+/*
+ *                } else if(strcasecmp(cmd_name, "CALL") == 0) { 
+ *                        cmd_array[ip++] = CMD_CALL;
+ *
+ *                        if (sscanf(text->lines[line_count].first_ch +
+ *                        strlen("CALL"), "%s", str_val) == 1) {
+ *                                cmd_array[ip++] = 
+ *                                find_func(funcs, func_count, str_val);
+ *                        }
+ *                } else if(strcasecmp(cmd_name, "RET") == 0) { 
+ *                        cmd_array[ip++] = CMD_RET;
+ *                        cmd_array[ip++] = funcs[label_count].ip;
+ *                        label_count--;
+ */
+                } else
                 CMD(ADD) 
                 CMD(SUB) 
                 CMD(MUL)
@@ -116,15 +195,16 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                 CMD(IN)
                 CMD(HLT) 
                 { 
-                        if (cycle_count > 0 && 
-                            find_label(labels, label_count, cmd_name) == -1) {
-                                fprintf(stderr, "Error: Couldn't find "
-                                        "command '%s'\n", cmd_name);
+                        if (find_label(labels, label_count, cmd_name) == -1) {
+                                if (cycle_count > 0) {
+                                        fprintf(stderr, "Error: Couldn't find "
+                                                "command '%s'\n", cmd_name);
 
-                                return;
+                                        return;
+                                }
+                                
+                                make_label(labels, ip, &label_count, cmd_name);
                         }
-                        
-                        make_label(labels, ip, &label_count, cmd_name);
                 }
 
                 line_count++;
