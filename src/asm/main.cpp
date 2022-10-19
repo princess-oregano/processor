@@ -32,6 +32,8 @@ main(int argc, char *argv[])
 
                 text2code(&text, &cmd_arr);
 
+                write_listing(cmd_arr);
+
                 if (write_code(cmd_arr, &dst) == ERR_ALLOC)
                         return ERR_ALLOC;
 

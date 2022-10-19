@@ -222,3 +222,72 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
         stack_dtor(&ret_ip);
 }
 
+void
+write_listing(cmd_arr_t cmd_arr)
+{
+        FILE *list = nullptr;
+        list = fopen("listing.txt", "w");
+
+        for (size_t ip = 0; ip < cmd_arr.cmd_count; ) {
+                fprintf(list,"%04zu", ip);
+                fprintf(list, "    ");
+                ip++;
+                switch (cmd_arr.cmd_array[ip - 1] & CMD_MASK) {
+                        case CMD_PUSH:
+                                fprintf(list, "PUSH");
+                                fprintf(list, " %d", cmd_arr.cmd_array[ip++]);
+                                break;
+                        case CMD_POP:
+                                fprintf(list, "POP");
+                                fprintf(list, " %d", cmd_arr.cmd_array[ip++]);
+                                break;
+                        case CMD_JMP:
+                                fprintf(list, "JMP");
+                                fprintf(list, " %d", cmd_arr.cmd_array[ip++]);
+                                break;
+                        case CMD_CALL:
+                                fprintf(list, "CALL");
+                                fprintf(list, " %d", cmd_arr.cmd_array[ip++]);
+                                break;
+                        case CMD_RET:
+                                fprintf(list, "RET");
+                                fprintf(list, " %d", cmd_arr.cmd_array[ip++]);
+                                break;
+
+                        case CMD_HLT:
+                                fprintf(list, "HLT");
+                                break;
+                        case CMD_ADD:
+                                fprintf(list, "ADD");
+                                break;
+                        case CMD_SUB:
+                                fprintf(list, "SUB");
+                                break;
+                        case CMD_MUL:
+                                fprintf(list, "MUL");
+                                break;
+                        case CMD_DIV:
+                                fprintf(list, "DIV");
+                                break;
+                        case CMD_OUT:
+                                fprintf(list, "OUT");
+                                break;
+                        case CMD_DUP:
+                                fprintf(list, "DUP");
+                                break;
+                        case CMD_IN:
+                                fprintf(list, "IN");
+                                break;
+                        case CMD_SQRT:
+                                fprintf(list, "SQRT");
+                                break;
+                        case CMD_DMP & CMD_MASK:
+                                fprintf(list, "DMP");
+                                break;
+                }
+                fprintf(list, "\n");
+        }
+
+        fprintf(list, "\n");
+}
+

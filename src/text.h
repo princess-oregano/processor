@@ -54,7 +54,8 @@ destroy_text(text_t *text, cmd_arr_t *cmd_arr, char *dst_name);
 int
 write_code(cmd_arr_t cmd_arr, file_t *dst);
 // Changes file extention.
-char *change_ext(char *src_filename, const char *ext);
+char *
+change_ext(char *src_filename, const char *ext);
 
 #endif // TEXT_H
 

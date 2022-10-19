@@ -36,6 +36,9 @@ struct func_t {
 // Converts text to int array with machine code.
 void
 text2code(text_t *text, cmd_arr_t *cmd_arr);
+// Writes listing of program to listing file.
+void
+write_listing(cmd_arr_t cmd_arr);
 
 #endif // TEXT2CODE_H
 
