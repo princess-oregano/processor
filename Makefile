@@ -9,8 +9,8 @@ SRCDIR_CPU := $(addprefix $(SRCDIR)/, $(CPU))
 OBJDIR_ASM := $(addprefix $(OBJDIR)/, $(ASM))
 OBJDIR_CPU := $(addprefix $(OBJDIR)/, $(CPU))
 
-SRC_ASM := main.cpp ../text.cpp text2code.cpp 
-SRC_CPU := main.cpp process.cpp ../text.cpp stack.cpp error.cpp
+SRC_ASM := main.cpp ../text.cpp text2code.cpp ../stack.cpp ../error.cpp
+SRC_CPU := main.cpp process.cpp ../text.cpp ../stack.cpp ../error.cpp
 OBJ_ASM := $(addprefix $(OBJDIR_ASM)/, $(SRC_ASM:.cpp=.o))
 OBJ_CPU := $(addprefix $(OBJDIR_CPU)/, $(SRC_CPU:.cpp=.o))
 

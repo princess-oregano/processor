@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "text2code.h"
+#include "../stack.h"
 
 //////////////////////FUNCTIONS/////////////////////
 
@@ -10,9 +11,6 @@ find_func(func_t *funcs, size_t size, char *str)
 {
         char func[FUNC_SIZE] = "";
         size_t len = strlen(str);
-
-        if (str[len-1] == ':')
-                len--;
 
         memcpy(func, str, len);
         for (size_t i = 0; i < size; i++) {
@@ -28,10 +26,26 @@ find_func(func_t *funcs, size_t size, char *str)
 static void
 make_func(func_t *funcs, size_t ip, size_t *size, char *str)
 {
+        funcs[*size].n_func = *size;
         funcs[*size].ip = ip;
         memcpy(funcs[*size].name, str, strlen(str));
 
         *size += 1;
+}
+
+// Dumps info about functions.
+static void
+func_dump(func_t *funcs, size_t size)
+{
+        for (size_t i = 0; i < size; i++) {
+                fprintf(stderr, "Function %zu:\n"
+                                "Name '%s'\n"
+                                "IP '%zu'\n", funcs[i].n_func,
+                                              funcs[i].name,
+                                              funcs[i].ip);
+
+                fprintf(stderr, "\n");
+        }
 }
 
 ////////////////////END_FUNCTIONS///////////////////
@@ -100,6 +114,9 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
 {
         int *cmd_array = (int *) calloc(text->num_of_lines * 2, sizeof(int));
 
+        stack_t ret_ip {};
+        stack_ctor(&ret_ip, FUNCS_NUM, VAR_INFO(ret_ip));
+
         char cmd_name[MAX_CMD_SIZE] = {};
         label_t labels[LABELS_NUM] = {};
         func_t  funcs [FUNCS_NUM]  = {};
@@ -152,13 +169,14 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
 
                         if (sscanf(text->lines[line_count].first_ch +
                         strlen("CALL"), "%s", str_val) == 1) {
-                                cmd_array[ip++] =
-                                find_func(funcs, func_count, str_val);
+                                if ((cmd_array[ip++] =
+                                find_func(funcs, func_count, str_val)) != -1) {
+                                        stack_push(&ret_ip, ip);
+                                }
                         }
                 } else if(strcasecmp(cmd_name, "RET") == 0) {
                         cmd_array[ip++] = CMD_RET;
-                        cmd_array[ip++] = (int) funcs[func_count].ip;
-                        func_count--;
+                        stack_pop(&ret_ip, &cmd_array[ip++]);
                 } else if (strcasecmp(cmd_name, "SQRT") == 0) {
                         cmd_array[ip++] = CMD_SQRT;
                         if (sscanf(text->lines[line_count].first_ch +
@@ -176,7 +194,8 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                 CMD(IN)
                 CMD(HLT)
                 {
-                        if (find_label(labels, label_count, cmd_name) == -1) {
+                        if (find_label(labels, label_count, cmd_name) == -1 &&
+                            find_func (funcs,  func_count,  cmd_name) == -1) {
                                 if (cycle_count > 0) {
                                         fprintf(stderr, "Error: Couldn't find "
                                                 "command '%s'\n", cmd_name);
@@ -184,7 +203,8 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                                         return;
                                 }
 
-                                make_label(labels, ip, &label_count, cmd_name);
+                                if (!make_label(labels, ip, &label_count, cmd_name))
+                                        make_func(funcs, ip,  &func_count, cmd_name);
                         }
                 }
 
@@ -198,5 +218,7 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
 
         cmd_arr->cmd_array = cmd_array;
         cmd_arr->cmd_count = ip;
+
+        stack_dtor(&ret_ip);
 }
 

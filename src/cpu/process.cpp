@@ -4,9 +4,10 @@
 #include <math.h>
 #include "../cmd.h"
 #include "process.h"
-#include "stack.h"
+#include "../stack.h"
 
-static void cpu_dump(int *cmd_buf, size_t cmd_count, size_t ip)
+static void
+cpu_dump(int *cmd_buf, size_t cmd_count, size_t ip)
 {
         printf("CPU dump:\n");
 
@@ -29,6 +30,7 @@ execute(int *cmd_buf, size_t size)
         int val1 = 0;
         int val2 = 0;
         stack_t stack {};
+        stack_t func_ip {};
         size_t ip = 0;
         
         int reg[N_REG] = {};
@@ -62,6 +64,8 @@ execute(int *cmd_buf, size_t size)
                         DEF_CMD(DUP, POP(val1) PUSH(val1) PUSH(val2))
                         DEF_CMD(OUT, POP(val1) printf("%d\n", val1);)
                         DEF_CMD(JMP, ip = (size_t) cmd_buf[ip];)
+                        DEF_CMD(CALL, ip = (size_t) cmd_buf[ip];)
+                        DEF_CMD(RET, ip = (size_t) cmd_buf[ip];)
                         DEF_CMD(IN, scanf("%d", &val1); PUSH(val1))
                         DEF_CMD(SQRT, val1 = (int) sqrt(val1); PUSH(val1))
                         DEF_CMD(DMP & CMD_MASK, cpu_dump(cmd_buf, size, ip);)

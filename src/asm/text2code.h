@@ -29,6 +29,7 @@ struct label_t {
 
 struct func_t {
         size_t ip = 0;
+        size_t n_func = 0;
         char name[FUNC_SIZE] = "";
 };
 
