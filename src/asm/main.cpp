@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include "../include/text.h"
-#include "../include/text2code.h"
+#include "../text.h"
+#include "text2code.h"
 
 const char *FILE_EXT = ".mur";
 

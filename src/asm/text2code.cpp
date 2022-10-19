@@ -1,9 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
-#include "../include/text2code.h"
+#include "text2code.h"
 
 //////////////////////FUNCTIONS/////////////////////
 
+// Finds function int the array, returns ip.
 static int
 find_func(func_t *funcs, size_t size, char *str)
 {
@@ -16,6 +17,7 @@ find_func(func_t *funcs, size_t size, char *str)
         return -1;
 }
 
+// Makes function.
 static void
 make_func(func_t *funcs, size_t ip, size_t *size, char *str)
 {
@@ -25,7 +27,7 @@ make_func(func_t *funcs, size_t ip, size_t *size, char *str)
         *size += 1;
 }
 
-////////////////////////////////////////////////////
+////////////////////END_FUNCTIONS///////////////////
 
 ///////////////////////LABELS///////////////////////
 
@@ -41,7 +43,6 @@ find_label(label_t *labels, size_t size, char *str)
 
         strncpy(label, str, len);
         for (size_t i = 0; i < size; i++) {
-                fprintf(stderr, "%s %s\n", labels[i].name, label);
                 if (strcmp(labels[i].name, label) == 0) {
                         return (int) labels[i].ip;
                 }
@@ -63,21 +64,21 @@ make_label(label_t *labels, size_t ip, size_t *size, char *str)
 
         labels[*size].n_label = *size;
         labels[*size].ip = ip;
-        strncpy(labels[*size].name, str, len);
+        memcpy(labels[*size].name, str, len);
 
         *size += 1;
 
         return true;
 }
 
-// Dumps all info about labels.
+// Dumps info about labels.
 static void
 label_dump(label_t *labels, size_t size)
 {
         for (size_t i = 0; i < size; i++) {
                 fprintf(stderr, "Label %zu:\n"
                                 "Name '%s'\n"
-                                "IP '%zu'\n", labels[i].n_label, 
+                                "IP '%zu'\n", labels[i].n_label,
                                               labels[i].name,
                                               labels[i].ip);
 
@@ -85,7 +86,7 @@ label_dump(label_t *labels, size_t size)
         }
 }
 
-////////////////////////////////////////////////////
+///////////////////END_LABELS///////////////////////
 
 void
 text2code(text_t *text, cmd_arr_t *cmd_arr)
@@ -108,47 +109,23 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                 sscanf(text->lines[line_count].first_ch, "%s", cmd_name);
 
                 if (strcasecmp(cmd_name, "PUSH") == 0) {
-                        if (sscanf(text->lines[line_count].first_ch +
-                            strlen("PUSH"), "%d", &val) == 1) {
-                                cmd_array[ip++] =   CMD_PUSH | 
-                                                  IMMED_MASK;
-                                cmd_array[ip++] = val;
-                        } else if (sscanf(text->lines[line_count].first_ch +
-                                strlen("PUSH"), "[%d]", &val) == 1) {
-                                cmd_array[ip++] =   CMD_PUSH | 
-                                                    RAM_MASK | 
-                                                  IMMED_MASK;
-                                cmd_array[ip++] = val;
-                        } else if (sscanf(text->lines[line_count].first_ch +
-                                strlen("PUSH"), "%s", str_val) == 1) {
-                                cmd_array[ip++] = CMD_PUSH | 
-                                                  REG_MASK;
-                                cmd_array[ip++] = str_val[1] - 'a' + 1;
-                        } else if (sscanf(text->lines[line_count].first_ch +
-                                strlen("PUSH"), "[%s]", str_val) == 1) {
-                                cmd_array[ip++] = CMD_PUSH | 
-                                                  REG_MASK | 
-                                                  RAM_MASK;
-                                cmd_array[ip++] = str_val[1] - 'a' + 1;
+                        IF(PUSH, %d, &val, (IMMED_MASK), val)
+                        IF(PUSH, [%d], &val, (IMMED_MASK | RAM_MASK), val)
+                        IF(PUSH, %s, str_val, (REG_MASK), str_val[1] - 'a' + 1)
+                        IF(PUSH, [%s], str_val, (REG_MASK | RAM_MASK), str_val[1] - 'a' + 1)
+                        {
+                                fprintf(stderr, "Error: invalid PUSH usage.\n");
+
+                                return;
                         }
                 } else if (strcasecmp(cmd_name, "POP") == 0) {
-                        if (sscanf(text->lines[line_count].first_ch +
-                                strlen("POP"), "[%d]", &val) == 1) {
-                                cmd_array[ip++] =    CMD_POP | 
-                                                    RAM_MASK | 
-                                                  IMMED_MASK;
-                                cmd_array[ip++] = val;
-                        } else if (sscanf(text->lines[line_count].first_ch +
-                                strlen("POP"), "%s", str_val) == 1) {
-                                cmd_array[ip++] =  CMD_POP | 
-                                                  REG_MASK;
-                                cmd_array[ip++] = str_val[1] - 'a' + 1;
-                        } else if (sscanf(text->lines[line_count].first_ch +
-                                strlen("POP"), "[%s]", str_val) == 1) {
-                                cmd_array[ip++] =  CMD_POP | 
-                                                  REG_MASK | 
-                                                  RAM_MASK;
-                                cmd_array[ip++] = str_val[1] - 'a';
+                        IF(POP, [%d], &val, (IMMED_MASK | RAM_MASK), val)
+                        IF(POP, %s, str_val, (REG_MASK), str_val[1] - 'a' + 1)
+                        IF(POP, [%s], str_val, (REG_MASK | RAM_MASK), str_val[1] - 'a' + 1)
+                        {
+                                fprintf(stderr, "Error: invalid POP usage.\n");
+
+                                return;
                         }
                 } else if (strcasecmp(cmd_name, "JMP") == 0) {
                         cmd_array[ip++] = CMD_JMP;
@@ -159,42 +136,39 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                                         cmd_array[ip++] = val;
                         } else if (sscanf(text->lines[line_count].first_ch +
                         strlen("JMP"), " %c%s", &c, str_val) == 2) {
-                                if (c == ':') 
-                                        cmd_array[ip++] = 
+                                if (c == ':')
+                                        cmd_array[ip++] =
                                 find_label(labels, label_count, str_val);
-                                label_dump(labels, label_count);
                         }
+                } else if(strcasecmp(cmd_name, "CALL") == 0) {
+                        cmd_array[ip++] = CMD_CALL;
+
+                        if (sscanf(text->lines[line_count].first_ch +
+                        strlen("CALL"), "%s", str_val) == 1) {
+                                cmd_array[ip++] = (size_t)
+                                find_func(funcs, func_count, str_val);
+                        }
+                } else if(strcasecmp(cmd_name, "RET") == 0) {
+                        cmd_array[ip++] = CMD_RET;
+                        cmd_array[ip++] = funcs[func_count].ip;
+                        func_count--;
                 } else if (strcasecmp(cmd_name, "SQRT") == 0) {
                         cmd_array[ip++] = CMD_SQRT;
                         if (sscanf(text->lines[line_count].first_ch +
                         strlen("SQRT"), "%d", &val) == 1) {
                                 cmd_array[ip++] = val;
                         }
-/*
- *                } else if(strcasecmp(cmd_name, "CALL") == 0) { 
- *                        cmd_array[ip++] = CMD_CALL;
- *
- *                        if (sscanf(text->lines[line_count].first_ch +
- *                        strlen("CALL"), "%s", str_val) == 1) {
- *                                cmd_array[ip++] = 
- *                                find_func(funcs, func_count, str_val);
- *                        }
- *                } else if(strcasecmp(cmd_name, "RET") == 0) { 
- *                        cmd_array[ip++] = CMD_RET;
- *                        cmd_array[ip++] = funcs[label_count].ip;
- *                        label_count--;
- */
                 } else
-                CMD(ADD) 
-                CMD(SUB) 
+                CMD(ADD)
+                CMD(SUB)
                 CMD(MUL)
                 CMD(DIV)
                 CMD(OUT)
                 CMD(DMP)
                 CMD(DUP)
                 CMD(IN)
-                CMD(HLT) 
-                { 
+                CMD(HLT)
+                {
                         if (find_label(labels, label_count, cmd_name) == -1) {
                                 if (cycle_count > 0) {
                                         fprintf(stderr, "Error: Couldn't find "
@@ -202,7 +176,7 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
 
                                         return;
                                 }
-                                
+
                                 make_label(labels, ip, &label_count, cmd_name);
                         }
                 }

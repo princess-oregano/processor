@@ -4,7 +4,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include "../include/text.h"
+#include "text.h"
 
 int
 get_file(const char *filename, file_t *file, const char *mode)

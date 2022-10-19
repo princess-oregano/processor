@@ -9,12 +9,12 @@
                                 PUSH(dst)                \
                                 ip++;                    \
                                 }                        \
-                        else 
+                        else
 #define IF_POP(msk, dst)  if ((cmd & (msk)) == (msk)) {  \
                                 POP(dst)                 \
                                 ip++;                    \
                                 }                        \
-                        else 
+                        else
 #define DEF_CMD(name, ...) case CMD_##name: ip++; __VA_ARGS__ break;
 
 const int N_REG = 5;

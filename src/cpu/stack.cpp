@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include "../include/error.h"
-#include "../include/stack.h"
+#include "error.h"
+#include "stack.h"
 
 static unsigned int
 crc8(unsigned int crc, void *data, size_t len)
