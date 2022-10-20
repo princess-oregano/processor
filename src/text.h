@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
+const int MAX_FILES_NUM = 50;
+const char * const FILE_EXT = ".mur";
+
 enum error_text_t {
         ERR_NO_ERR    = 0,
         ERR_OPEN_FILE = 1,
@@ -38,6 +41,9 @@ struct cmd_arr_t {
         size_t cmd_count;
 };
 
+// Processes command line arguments.
+void
+process_args(int argc, char *argv[], const char *ext, params_t *params);
 // Opens file and gets info about it.
 int
 get_file(const char *filename, file_t *file, const char *mode);
@@ -53,9 +59,6 @@ destroy_text(text_t *text, cmd_arr_t *cmd_arr, char *dst_name);
 // Prints given text in stream.
 int
 write_code(cmd_arr_t cmd_arr, file_t *dst);
-// Changes file extention.
-char *
-change_ext(char *src_filename, const char *ext);
 
 #endif // TEXT_H
 

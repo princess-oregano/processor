@@ -6,6 +6,32 @@
 #include <sys/mman.h>
 #include "text.h"
 
+// Changes file extention.
+static char *
+change_ext(char *src_filename, const char *ext)
+{
+        char *c = strrchr(src_filename, '.');
+        size_t c_len = (size_t) (c - src_filename) + strlen(ext);
+        char *dst_filename = (char *) calloc (c_len + 1, sizeof(char));
+
+        strncpy(dst_filename, src_filename, c_len - strlen(ext));
+        dst_filename[c_len - strlen(ext)] = '\0';
+        fprintf(stderr, "dst_filename = %s\n", dst_filename);
+        strncat(dst_filename, ext, strlen(ext));
+
+        return dst_filename;
+}
+
+void
+process_args(int argc, char *argv[], const char *ext, params_t *params)
+{
+        for (int i = 1; i < argc; i++) {
+                        params[i].src_filename = argv[i];
+                        params[i].dst_filename =
+                        change_ext(params[i].src_filename, ext);
+                }
+}
+
 int
 get_file(const char *filename, file_t *file, const char *mode)
 {
@@ -124,20 +150,5 @@ destroy_text(text_t *text, cmd_arr_t *cmd_arr, char *dst_name)
                 munmap(text->buffer, text->buf_size);
         if (dst_name != nullptr)
                 free(dst_name);
-}
-
-char *
-change_ext(char *src_filename, const char *ext)
-{
-        char *c = strrchr(src_filename, '.');
-        size_t c_len = (size_t) (c - src_filename) + strlen(ext);
-        char *dst_filename = (char *) calloc (c_len + 1, sizeof(char));
-
-        strncpy(dst_filename, src_filename, c_len - strlen(ext));
-        dst_filename[c_len - strlen(ext)] = '\0';
-        fprintf(stderr, "dst_filename = %s\n", dst_filename);
-        strncat(dst_filename, ext, strlen(ext));
-
-        return dst_filename;
 }
 

@@ -3,23 +3,20 @@
 #include "../text.h"
 #include "text2code.h"
 
-const char *FILE_EXT = ".mur";
-
 int
 main(int argc, char *argv[])
 {
-        size_t num_of_files = (size_t) argc;
+        params_t params[MAX_FILES_NUM] = {};
+        process_args(argc, argv, FILE_EXT, params);
 
-        for (size_t file_count = 1; file_count < num_of_files; file_count++) {
+        for (int i = 1; i < argc; i++) {
                 file_t src {};
                 file_t dst {};
                 text_t text {};
                 cmd_arr_t cmd_arr {};
 
-                char *dst_filename = change_ext(argv[file_count], FILE_EXT);
-
-                if ((get_file(argv[file_count], &src, "r") == ERR_STATS) ||
-                    (get_file(dst_filename, &dst, "w") == ERR_STATS))
+                if ((get_file(params[i].src_filename, &src, "r") == ERR_STATS) ||
+                    (get_file(params[i].dst_filename, &dst, "w") == ERR_STATS))
                         return ERR_STATS;
 
                 if (read_file(&text, &src) == ERR_ALLOC)
@@ -37,7 +34,7 @@ main(int argc, char *argv[])
                 if (write_code(cmd_arr, &dst) == ERR_ALLOC)
                         return ERR_ALLOC;
 
-                destroy_text(&text, &cmd_arr, dst_filename);
+                destroy_text(&text, &cmd_arr, params[i].dst_filename);
 
                 fclose(dst.file_ptr);
         }

@@ -6,12 +6,13 @@
 int
 main(int argc, char *argv[])
 {
-        size_t num_of_files = (size_t) argc;
+        params_t params[MAX_FILES_NUM] = {};
+        process_args(argc, argv, FILE_EXT, params);
 
-        for (size_t file_count = 1; file_count < num_of_files; file_count++) {
+        for (int i = 1; i < argc; i++) {
                 file_t src {};
 
-                get_file(argv[file_count], &src, "r");
+                get_file(params[i].dst_filename, &src, "r");
 
                 size_t file_size = (size_t) src.file_stats.st_size;
 
@@ -23,6 +24,7 @@ main(int argc, char *argv[])
                 execute(cmd_buf, file_size / sizeof(int));
 
                 free(cmd_buf);
+                free(params[i].dst_filename);
         }
 
         return 0;
