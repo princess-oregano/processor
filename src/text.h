@@ -4,9 +4,6 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-const int MAX_FILES_NUM = 50;
-const char * const FILE_EXT = ".mur";
-
 enum error_text_t {
         ERR_NO_ERR    = 0,
         ERR_OPEN_FILE = 1,
@@ -17,11 +14,6 @@ enum error_text_t {
 struct file_t {
         FILE  *file_ptr = nullptr;
         struct stat file_stats = {};
-};
-
-struct params_t {
-        char *src_filename = nullptr;
-        char *dst_filename = nullptr;
 };
 
 struct line_t {
@@ -41,9 +33,6 @@ struct cmd_arr_t {
         size_t cmd_count;
 };
 
-// Processes command line arguments.
-void
-process_args(int argc, char *argv[], const char *ext, params_t *params);
 // Opens file and gets info about it.
 int
 get_file(const char *filename, file_t *file, const char *mode);
