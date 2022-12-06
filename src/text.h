@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <sys/stat.h>
+#include "cmd.h"
 
 enum error_text_t {
         ERR_NO_ERR    = 0,
@@ -26,11 +27,6 @@ struct text_t {
         size_t buf_size     = 0;
         line_t *lines       = {};
         size_t num_of_lines = 0;
-};
-
-struct cmd_arr_t {
-        int *cmd_array;
-        size_t cmd_count;
 };
 
 // Opens file and gets info about it.

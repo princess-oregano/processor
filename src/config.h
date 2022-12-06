@@ -1,7 +1,7 @@
 #ifndef CONFIG_STACK_H
 #define CONFIG_STACK_H
 
-typedef int elem_t;
+typedef double elem_t;
 
 #define CANARY
 

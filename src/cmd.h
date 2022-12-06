@@ -1,3 +1,6 @@
+#ifndef CMD_H
+#define CMD_H
+
 enum cmd_t {
         CMD_HLT  = 0,
         CMD_PUSH = 1,
@@ -16,6 +19,12 @@ enum cmd_t {
         CMD_DMP  = -1,
 };
 
+#include <stdio.h>
+struct cmd_arr_t {
+        double *cmd_array;
+        size_t cmd_count;
+};
+
 enum reg_t {
         REG_RAX = 1,
         REG_RBX = 2,
@@ -27,4 +36,6 @@ const int RAM_MASK   = 0x80;
 const int REG_MASK   = 0x40;
 const int IMMED_MASK = 0x20;
 const int CMD_MASK   = 0x1F;
+
+#endif // CMD_H
 

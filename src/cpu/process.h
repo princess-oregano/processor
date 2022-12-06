@@ -21,7 +21,7 @@ const int N_REG = 5;
 const int N_RAM = 15;
 
 void
-execute(int *cmd_buf, size_t size);
+execute(double *cmd_buf, size_t size);
 
 #endif // PROCESS_H
 

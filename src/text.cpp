@@ -106,7 +106,7 @@ write_code(cmd_arr_t cmd_arr, file_t *dst)
 {
         setvbuf(dst->file_ptr, NULL, _IONBF, 0);
 
-        fwrite(cmd_arr.cmd_array, sizeof(int), cmd_arr.cmd_count, dst->file_ptr);
+        fwrite(cmd_arr.cmd_array, sizeof(double), cmd_arr.cmd_count, dst->file_ptr);
 
         return ERR_NO_ERR;
 }

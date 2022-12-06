@@ -17,12 +17,12 @@ main(int argc, char *argv[])
 
                 size_t file_size = (size_t) src.file_stats.st_size;
 
-                int *cmd_buf = (int *) calloc(file_size, sizeof(int));
+                double *cmd_buf = (double *) calloc(file_size, sizeof(double));
 
-                fread(cmd_buf, sizeof(int), file_size / sizeof(int),
+                fread(cmd_buf, sizeof(double), file_size / sizeof(double),
                       src.file_ptr);
 
-                execute(cmd_buf, file_size / sizeof(int));
+                execute(cmd_buf, file_size / sizeof(double));
 
                 free(cmd_buf);
                 free(params.filename[i].dst);

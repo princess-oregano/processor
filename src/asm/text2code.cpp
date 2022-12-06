@@ -1,8 +1,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
 #include "text2code.h"
 #include "../stack.h"
+
+const double THRESHOLD = 1e-10;
+
+static bool 
+are_equal(double value1, double value2)
+{
+        return (fabs(value1 - value2) < THRESHOLD);
+}
 
 ///////////////////////LABELS///////////////////////
 
@@ -63,7 +72,7 @@ label_dump(label_t *labels, size_t size)
 void
 generate(text_t *text, cmd_arr_t *cmd_arr)
 {
-        int *cmd_array = (int *) calloc(text->num_of_lines * 2, sizeof(int));
+        double *cmd_array = (double *) calloc(text->num_of_lines * 2, sizeof(double));
 
         stack_t ret_ip {};
         stack_ctor(&ret_ip, FUNCS_NUM, VAR_INFO(ret_ip));
@@ -74,7 +83,7 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
         size_t  line_count = 0;
         size_t label_count = 0;
         char str_val[40] = {};
-        int val = 0;
+        double val = 0;
         char c = 0;
 
         int cycle_count = 0;
@@ -82,8 +91,8 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
                 sscanf(text->lines[line_count].first_ch, "%s", cmd_name);
 
                 if (strcasecmp(cmd_name, "PUSH") == 0) {
-                        IF(PUSH, %d, &val, (IMMED_MASK), val)
-                        IF(PUSH, [%d], &val, (IMMED_MASK | RAM_MASK), val)
+                        IF(PUSH, %lf, &val, (IMMED_MASK), val)
+                        IF(PUSH, [%lf], &val, (IMMED_MASK | RAM_MASK), val)
                         IF(PUSH, %s, str_val, (REG_MASK), str_val[1] - 'a' + 1)
                         IF(PUSH, [%s], str_val, (REG_MASK | RAM_MASK), str_val[1] - 'a' + 1)
                         {
@@ -92,7 +101,7 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
                                 return;
                         }
                 } else if (strcasecmp(cmd_name, "POP") == 0) {
-                        IF(POP, [%d], &val, (IMMED_MASK | RAM_MASK), val)
+                        IF(POP, [%lf], &val, (IMMED_MASK | RAM_MASK), val)
                         IF(POP, %s, str_val, (REG_MASK), str_val[1] - 'a' + 1)
                         IF(POP, [%s], str_val, (REG_MASK | RAM_MASK), str_val[1] - 'a' + 1)
                         {
@@ -104,7 +113,7 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
                         cmd_array[ip++] = CMD_JMP;
 
                         if (sscanf(text->lines[line_count].first_ch +
-                        strlen("JMP"), " %c%d", &c, &val) == 2
+                        strlen("JMP"), " %c%lf", &c, &val) == 2
                         && c == ':') {
                                 cmd_array[ip++] = val;
                         } else if (sscanf(text->lines[line_count].first_ch +
@@ -118,9 +127,9 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
 
                         if (sscanf(text->lines[line_count].first_ch +
                         strlen("CALL"), "%s", str_val) == 1) {
-                                if ((cmd_array[ip++] =
-                                find_label(labels, label_count, str_val)) != -1) {
-                                        stack_push(&ret_ip, ip);
+                                if (!are_equal((cmd_array[ip++] =
+                                (double) find_label(labels, label_count, str_val)), -1)) {
+                                        stack_push(&ret_ip, (double) ip);
                                 }
                         }
                 } else if(strcasecmp(cmd_name, "RET") == 0) {
@@ -129,7 +138,7 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
                 } else if (strcasecmp(cmd_name, "SQRT") == 0) {
                         cmd_array[ip++] = CMD_SQRT;
                         if (sscanf(text->lines[line_count].first_ch +
-                        strlen("SQRT"), "%d", &val) == 1) {
+                        strlen("SQRT"), "%lf", &val) == 1) {
                                 cmd_array[ip++] = val;
                         }
                 } else
@@ -179,26 +188,26 @@ write_listing(cmd_arr_t cmd_arr)
                 fprintf(list,"%04zu", ip);
                 fprintf(list, "    ");
                 ip++;
-                switch (cmd_arr.cmd_array[ip - 1] & CMD_MASK) {
+                switch (((int) cmd_arr.cmd_array[ip - 1]) & CMD_MASK) {
                         case CMD_PUSH:
                                 fprintf(list, "PUSH");
-                                fprintf(list, " %d", cmd_arr.cmd_array[ip++]);
+                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
                                 break;
                         case CMD_POP:
                                 fprintf(list, "POP");
-                                fprintf(list, " %d", cmd_arr.cmd_array[ip++]);
+                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
                                 break;
                         case CMD_JMP:
                                 fprintf(list, "JMP");
-                                fprintf(list, " %d", cmd_arr.cmd_array[ip++]);
+                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
                                 break;
                         case CMD_CALL:
                                 fprintf(list, "CALL");
-                                fprintf(list, " %d", cmd_arr.cmd_array[ip++]);
+                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
                                 break;
                         case CMD_RET:
                                 fprintf(list, "RET");
-                                fprintf(list, " %d", cmd_arr.cmd_array[ip++]);
+                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
                                 break;
                         case CMD_HLT:
                                 fprintf(list, "HLT");
