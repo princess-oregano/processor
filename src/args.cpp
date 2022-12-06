@@ -13,8 +13,7 @@ change_ext(char *src_filename, const char *ext)
 
         strncpy(dst_filename, src_filename, c_len - strlen(ext));
         dst_filename[c_len - strlen(ext)] = '\0';
-        fprintf(stderr, "dst_filename = %s\n", dst_filename);
-        strncat(dst_filename, ext, strlen(ext));
+        strcat(dst_filename, ext);
 
         return dst_filename;
 }
@@ -25,7 +24,7 @@ process_args(int argc, char *argv[], params_t *params)
         for (int i = 1; i < argc; i++) {
                 params->filename[i].src = argv[i];
                 params->filename[i].dst = 
-                        change_ext(params[i].filename[i].src, FILE_EXT);
+                        change_ext(params->filename[i].src, FILE_EXT);
         }
 
         params->files_num = argc;

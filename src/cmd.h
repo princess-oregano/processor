@@ -16,6 +16,13 @@ enum cmd_t {
         CMD_DMP  = -1,
 };
 
+enum reg_t {
+        REG_RAX = 1,
+        REG_RBX = 2,
+        REG_RCX = 3,
+        REG_RDX = 4,
+};
+
 const int RAM_MASK   = 0x80;
 const int REG_MASK   = 0x40;
 const int IMMED_MASK = 0x20;

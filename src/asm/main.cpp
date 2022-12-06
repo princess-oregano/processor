@@ -8,9 +8,9 @@ int
 main(int argc, char *argv[])
 {
         params_t params {};
-        process_args(argc, argv, params);
+        process_args(argc, argv, &params);
 
-        for (int i = 1; i < params; i++) {
+        for (int i = 1; i < params.files_num; i++) {
                 file_t src {};
                 file_t dst {};
                 text_t text {};
@@ -28,14 +28,14 @@ main(int argc, char *argv[])
                 if (create_lines_arr(&text) == ERR_ALLOC)
                         return ERR_ALLOC;
 
-                text2code(&text, &cmd_arr);
+                generate(&text, &cmd_arr);
 
                 write_listing(cmd_arr);
 
                 if (write_code(cmd_arr, &dst) == ERR_ALLOC)
                         return ERR_ALLOC;
 
-                destroy_text(&text, &cmd_arr, params[i].dst_filename);
+                destroy_text(&text, &cmd_arr, params.filename[i].dst);
 
                 fclose(dst.file_ptr);
         }

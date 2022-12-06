@@ -24,42 +24,12 @@ cpu_dump(int *cmd_buf, size_t cmd_count, size_t ip)
         printf("^\n");
 }
 
-DEF_CMD(add, "add", 0,
-{
-        POP(tmp1);
-        POP(tmp2);
-        PUSH(tmp1 + tmp2);
-})
-
-        tmp[1] = stk_pop(&stack);
-        tmp[2] = stk_pop(&stack);
-        stk_push(&stack, tmp1 + tmp2;
-
-
-
-DEF_CMD(add, "add", 0)
-DEF_CMD(add, "add", 0)
-DEF_CMD(add, "add", 0)
-DEF_CMD(add, "add", 0)
-DEF_CMD(add, "add", 0)
-DEF_CMD(add, "add", 0)
-
-
-
-#define DEF_CMD(cmd, txt, n_arg)
-        if (cur_cmd == ENUM_##cmd)
-        {
-                docmd;
-        }
-
-#define PUSH(arg) stk_push(&cpu_stack, arg);
 void
 execute(int *cmd_buf, size_t size)
 {
         int val1 = 0;
         int val2 = 0;
         stack_t stack {};
-        stack_t func_ip {};
         size_t ip = 0;
         
         int reg[N_REG] = {};

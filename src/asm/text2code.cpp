@@ -1,54 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "text2code.h"
 #include "../stack.h"
-
-//////////////////////FUNCTIONS/////////////////////
-
-// Finds function int the array, returns ip.
-static int
-find_func(func_t *funcs, size_t size, char *str)
-{
-        char func[FUNC_SIZE] = "";
-        size_t len = strlen(str);
-
-        memcpy(func, str, len);
-        for (size_t i = 0; i < size; i++) {
-                if (strcmp(funcs[i].name, func) == 0) {
-                        return (int) funcs[i].ip;
-                }
-        }
-
-        return -1;
-}
-
-// Makes function.
-static void
-make_func(func_t *funcs, size_t ip, size_t *size, char *str)
-{
-        funcs[*size].n_func = *size;
-        funcs[*size].ip = ip;
-        memcpy(funcs[*size].name, str, strlen(str));
-
-        *size += 1;
-}
-
-// Dumps info about functions.
-static void
-func_dump(func_t *funcs, size_t size)
-{
-        for (size_t i = 0; i < size; i++) {
-                fprintf(stderr, "Function %zu:\n"
-                                "Name '%s'\n"
-                                "IP '%zu'\n", funcs[i].n_func,
-                                              funcs[i].name,
-                                              funcs[i].ip);
-
-                fprintf(stderr, "\n");
-        }
-}
-
-////////////////////END_FUNCTIONS///////////////////
 
 ///////////////////////LABELS///////////////////////
 
@@ -62,7 +16,7 @@ find_label(label_t *labels, size_t size, char *str)
         if (str[len-1] == ':')
                 len--;
 
-        strncpy(label, str, len);
+        memcpy(label, str, len);
         for (size_t i = 0; i < size; i++) {
                 if (strcmp(labels[i].name, label) == 0) {
                         return (int) labels[i].ip;
@@ -73,13 +27,12 @@ find_label(label_t *labels, size_t size, char *str)
 }
 
 // Creates label.
-static bool
+static void
 make_label(label_t *labels, size_t ip, size_t *size, char *str)
 {
-        size_t len = strlen(str) - 1;
-
-        if (str[len] != ':')
-                return false;
+        size_t len = strlen(str); 
+        if (str[len - 1] == ':')
+                len--;
 
         len = (len < LABEL_SIZE) ? len : LABEL_SIZE;
 
@@ -88,8 +41,6 @@ make_label(label_t *labels, size_t ip, size_t *size, char *str)
         memcpy(labels[*size].name, str, len);
 
         *size += 1;
-
-        return true;
 }
 
 // Dumps info about labels.
@@ -110,7 +61,7 @@ label_dump(label_t *labels, size_t size)
 ///////////////////END_LABELS///////////////////////
 
 void
-text2code(text_t *text, cmd_arr_t *cmd_arr)
+generate(text_t *text, cmd_arr_t *cmd_arr)
 {
         int *cmd_array = (int *) calloc(text->num_of_lines * 2, sizeof(int));
 
@@ -119,10 +70,8 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
 
         char cmd_name[MAX_CMD_SIZE] = {};
         label_t labels[LABELS_NUM] = {};
-        func_t  funcs [FUNCS_NUM]  = {};
         size_t ip = 0;
         size_t  line_count = 0;
-        size_t  func_count = 0;
         size_t label_count = 0;
         char str_val[40] = {};
         int val = 0;
@@ -170,7 +119,7 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                         if (sscanf(text->lines[line_count].first_ch +
                         strlen("CALL"), "%s", str_val) == 1) {
                                 if ((cmd_array[ip++] =
-                                find_func(funcs, func_count, str_val)) != -1) {
+                                find_label(labels, label_count, str_val)) != -1) {
                                         stack_push(&ret_ip, ip);
                                 }
                         }
@@ -194,8 +143,7 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                 CMD(IN)
                 CMD(HLT)
                 {
-                        if (find_label(labels, label_count, cmd_name) == -1 &&
-                            find_func (funcs,  func_count,  cmd_name) == -1) {
+                        if (find_label(labels, label_count, cmd_name) == -1) {
                                 if (cycle_count > 0) {
                                         fprintf(stderr, "Error: Couldn't find "
                                                 "command '%s'\n", cmd_name);
@@ -203,8 +151,7 @@ text2code(text_t *text, cmd_arr_t *cmd_arr)
                                         return;
                                 }
 
-                                if (!make_label(labels, ip, &label_count, cmd_name))
-                                        make_func(funcs, ip,  &func_count, cmd_name);
+                                make_label(labels, ip, &label_count, cmd_name);
                         }
                 }
 
@@ -253,7 +200,6 @@ write_listing(cmd_arr_t cmd_arr)
                                 fprintf(list, "RET");
                                 fprintf(list, " %d", cmd_arr.cmd_array[ip++]);
                                 break;
-
                         case CMD_HLT:
                                 fprintf(list, "HLT");
                                 break;
@@ -283,6 +229,9 @@ write_listing(cmd_arr_t cmd_arr)
                                 break;
                         case CMD_DMP & CMD_MASK:
                                 fprintf(list, "DMP");
+                                break;
+                        default:
+                                assert(0 && "Invalid usage.");
                                 break;
                 }
                 fprintf(list, "\n");
