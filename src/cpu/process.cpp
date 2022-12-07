@@ -39,7 +39,6 @@ execute(double *cmd_buf, size_t size)
 
         bool halt = false;
         while (ip < size && !halt) {
-                sleep(1);
                 int cmd = (int) cmd_buf[ip];
                 switch (cmd & CMD_MASK) {
                         DEF_CMD(PUSH, 
@@ -47,13 +46,21 @@ execute(double *cmd_buf, size_t size)
                                 IF_PUSH(REG_MASK | RAM_MASK, ram[(int) reg[ip]])
                                 IF_PUSH(IMMED_MASK, cmd_buf[ip])
                                 IF_PUSH(REG_MASK, reg[(int) cmd_buf[ip]])
-                                        assert(0 && "Invalid PUSH command.\n");
+                                {
+                                assert(0 && "Invalid PUSH command.\n");
+                                }
                                )
                         DEF_CMD(POP,
-                                IF_POP((RAM_MASK | IMMED_MASK), ram[(int) cmd_buf[ip]])
-                                IF_POP((REG_MASK | RAM_MASK), ram[(int) reg[ip]])
-                                IF_POP((REG_MASK), reg[(int) cmd_buf[ip]])
-                                        assert(0 && "Invalid POP command.\n");
+                                IF_POP((RAM_MASK | IMMED_MASK), ram[(int) cmd_buf[ip]], )
+                                IF_POP((REG_MASK | RAM_MASK), ram[(int) reg[ip]], )
+                                IF_POP((REG_MASK), reg[(int) cmd_buf[ip]],
+                                        if ((int) cmd_buf[ip] == REG_RSP) {
+                                        stack.size = (size_t) reg[REG_RSP];
+                                        fprintf(stderr, "move rsp = %lg\n", reg[REG_RSP]);
+                                        })
+                                {
+                                assert(0 && "Invalid POP command.\n");
+                                }
                                )
                         DEF_CMD(HLT, halt = true;)
                         DEF_CMD(ADD, POP(val1) POP(val2) PUSH(val1 + val2))
@@ -69,11 +76,11 @@ execute(double *cmd_buf, size_t size)
                         DEF_CMD(SQRT, val1 = sqrt(val1); PUSH(val1))
                         DEF_CMD(DMP & CMD_MASK, cpu_dump(cmd_buf, size, ip);)
                         default:
-                                ip++;
                                 assert(0 && "Invalid command.\n");
 
                 }
 
+                stack_dump(stack, VAR_INFO(stack));
                 cmd = (int) cmd_buf[ip];
         }
 

@@ -1,10 +1,12 @@
-push 1.2 
 dmp
-call ADD5
+push 10
+pop rax
+push 30
+pop rax
+push 40
+push 20
+push 1
+pop rsp
 out
 hlt
-ADD5
-push 5
-add
-ret
 

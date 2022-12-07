@@ -26,6 +26,7 @@ struct cmd_arr_t {
 };
 
 enum reg_t {
+        REG_RSP = 0,
         REG_RAX = 1,
         REG_RBX = 2,
         REG_RCX = 3,

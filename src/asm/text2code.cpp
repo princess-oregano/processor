@@ -4,10 +4,11 @@
 #include <math.h>
 #include "text2code.h"
 #include "../stack.h"
+#include "../log.h"
 
 const double THRESHOLD = 1e-10;
 
-static bool 
+static bool
 are_equal(double value1, double value2)
 {
         return (fabs(value1 - value2) < THRESHOLD);
@@ -39,7 +40,7 @@ find_label(label_t *labels, size_t size, char *str)
 static void
 make_label(label_t *labels, size_t ip, size_t *size, char *str)
 {
-        size_t len = strlen(str); 
+        size_t len = strlen(str);
         if (str[len - 1] == ':')
                 len--;
 
@@ -52,22 +53,99 @@ make_label(label_t *labels, size_t ip, size_t *size, char *str)
         *size += 1;
 }
 
-// Dumps info about labels.
+// Dumps info about labels.  
+[[maybe_unused]]
 static void
 label_dump(label_t *labels, size_t size)
 {
         for (size_t i = 0; i < size; i++) {
-                fprintf(stderr, "Label %zu:\n"
-                                "Name '%s'\n"
-                                "IP '%zu'\n", labels[i].n_label,
-                                              labels[i].name,
-                                              labels[i].ip);
+                log("Label %zu:\n"
+                    "Name '%s'\n"
+                    "IP '%zu'\n", labels[i].n_label,
+                                  labels[i].name,
+                                  labels[i].ip);
 
-                fprintf(stderr, "\n");
+                log("\n");
         }
 }
 
 ///////////////////END_LABELS///////////////////////
+
+
+static int
+gen_reg(char *reg)
+{
+        int val = 777;
+
+        if (strncasecmp(reg, "RSP", 3) == 0) {
+                val = REG_RSP;
+        } else if (strncasecmp(reg, "RAX", 3) == 0) {
+                val = REG_RAX;
+        } else if (strncasecmp(reg, "RBX", 3) == 0) {
+                val = REG_RBX;
+        } else if (strncasecmp(reg, "RCX", 3) == 0) {
+                val = REG_RCX;
+        } else if (strncasecmp(reg, "RDX", 3) == 0) {
+                val = REG_RDX;
+        } else {
+                log("Invalid usage: unknown argument.\n");
+        }
+
+        return val;
+}
+
+static void
+gen_push(char *buf, double *cmd_array, size_t *ip)
+{
+        double val = 0;
+        char str_val[40] = "";
+        if (sscanf(buf, "%lf", &val) == 1) {
+                cmd_array[(*ip)++] = CMD_PUSH | (IMMED_MASK);
+                cmd_array[(*ip)++] = val;
+        } else if (sscanf(buf, "[%lf]", &val) == 1) {
+                cmd_array[(*ip)++] = CMD_PUSH | (IMMED_MASK | RAM_MASK);
+                cmd_array[(*ip)++] = val;
+        } else if (sscanf(buf, "%s", str_val) == 1) {
+                cmd_array[(*ip)++] = CMD_PUSH | (REG_MASK);
+                cmd_array[(*ip)++] = gen_reg(str_val);
+        } else if (sscanf(buf, "[%s]", str_val) == 1) {
+                cmd_array[(*ip)++] = CMD_PUSH | (REG_MASK | IMMED_MASK);
+                cmd_array[(*ip)++] = gen_reg(str_val);
+        } else if (sscanf(buf, "[%lg+%s]", &val, str_val) == 1) {
+                cmd_array[(*ip)++] = CMD_PUSH |
+                        (IMMED_MASK | REG_MASK | RAM_MASK);
+                cmd_array[(*ip)++] = val;
+                cmd_array[(*ip)++] = gen_reg(str_val);
+        } else {
+                log("Error: invalid PUSH usage.\n");
+                return;
+        }
+}
+
+static void
+gen_pop(char *buf, double *cmd_array, size_t *ip)
+{
+        double val = 0;
+        char str_val[40] = "";
+        if (sscanf(buf, "[%lf]", &val) == 1) {
+                cmd_array[(*ip)++] = CMD_POP | (IMMED_MASK | RAM_MASK);
+                cmd_array[(*ip)++] = val;
+        } else if (sscanf(buf, "%s", str_val) == 1) {
+                cmd_array[(*ip)++] = CMD_POP | (REG_MASK);
+                cmd_array[(*ip)++] = gen_reg(str_val);
+        } else if (sscanf(buf, "[%s]", str_val) == 1) {
+                cmd_array[(*ip)++] = CMD_POP | (REG_MASK | IMMED_MASK);
+                cmd_array[(*ip)++] = gen_reg(str_val);
+        } else if (sscanf(buf, "[%lg+%s]", &val, str_val) == 1) {
+                cmd_array[(*ip)++] = CMD_POP |
+                        (IMMED_MASK | REG_MASK | RAM_MASK);
+                cmd_array[(*ip)++] = val;
+                cmd_array[(*ip)++] = gen_reg(str_val);
+        } else {
+                log("Error: invalid PUSH usage.\n");
+                return;
+        }
+}
 
 void
 generate(text_t *text, cmd_arr_t *cmd_arr)
@@ -91,24 +169,11 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
                 sscanf(text->lines[line_count].first_ch, "%s", cmd_name);
 
                 if (strcasecmp(cmd_name, "PUSH") == 0) {
-                        IF(PUSH, %lf, &val, (IMMED_MASK), val)
-                        IF(PUSH, [%lf], &val, (IMMED_MASK | RAM_MASK), val)
-                        IF(PUSH, %s, str_val, (REG_MASK), str_val[1] - 'a' + 1)
-                        IF(PUSH, [%s], str_val, (REG_MASK | RAM_MASK), str_val[1] - 'a' + 1)
-                        {
-                                fprintf(stderr, "Error: invalid PUSH usage.\n");
-
-                                return;
-                        }
+                        gen_push(text->lines[line_count].first_ch + 
+                                        strlen("PUSH"), cmd_array, &ip);
                 } else if (strcasecmp(cmd_name, "POP") == 0) {
-                        IF(POP, [%lf], &val, (IMMED_MASK | RAM_MASK), val)
-                        IF(POP, %s, str_val, (REG_MASK), str_val[1] - 'a' + 1)
-                        IF(POP, [%s], str_val, (REG_MASK | RAM_MASK), str_val[1] - 'a' + 1)
-                        {
-                                fprintf(stderr, "Error: invalid POP usage.\n");
-
-                                return;
-                        }
+                        gen_pop(text->lines[line_count].first_ch + 
+                                        strlen("PUSH"), cmd_array, &ip);
                 } else if (strcasecmp(cmd_name, "JMP") == 0) {
                         cmd_array[ip++] = CMD_JMP;
 
@@ -128,8 +193,8 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
                         if (sscanf(text->lines[line_count].first_ch +
                         strlen("CALL"), "%s", str_val) == 1) {
                                 if (!are_equal((cmd_array[ip++] =
-                                (double) find_label(labels, label_count, str_val)), -1)) {
-                                        stack_push(&ret_ip, (double) ip);
+                                        find_label(labels, label_count, str_val)), -1)) {
+                                                stack_push(&ret_ip, (double) ip);
                                 }
                         }
                 } else if(strcasecmp(cmd_name, "RET") == 0) {
