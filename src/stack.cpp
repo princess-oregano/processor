@@ -32,7 +32,6 @@ data_resize(stack_t *stack, size_t capacity)
         size_t data_size = capacity * sizeof(elem_t)
                  ON_CANARY(+ 2 * sizeof(unsigned long long));
         char *stk_data_ptr_tmp = (char *) realloc(data_ptr, data_size);
-        fprintf(stderr, "data_ptr = %p\n", stk_data_ptr_tmp);
 
         if (stk_data_ptr_tmp == nullptr) {
                 err.type.ERR_ALLOC = true;

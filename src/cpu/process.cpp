@@ -39,6 +39,7 @@ execute(double *cmd_buf, size_t size)
 
         bool halt = false;
         while (ip < size && !halt) {
+                usleep(10000);
                 int cmd = (int) cmd_buf[ip];
                 switch (cmd & CMD_MASK) {
                         DEF_CMD(PUSH, 
@@ -67,7 +68,7 @@ execute(double *cmd_buf, size_t size)
                         DEF_CMD(SUB, POP(val1) POP(val2) PUSH(val1 - val2))
                         DEF_CMD(MUL, POP(val1) POP(val2) PUSH(val1 * val2))
                         DEF_CMD(DIV, POP(val1) POP(val2) PUSH(val2 / val1))
-                        DEF_CMD(DUP, POP(val1) PUSH(val1) PUSH(val2))
+                        DEF_CMD(DUP, POP(val1) PUSH(val1) PUSH(val1))
                         DEF_CMD(OUT, POP(val1) printf("%lg\n", val1);)
                         DEF_CMD(JMP, ip = (size_t) cmd_buf[ip];)
                         DEF_CMD(CALL, PUSH((double) ip+1) ip = (size_t) cmd_buf[ip];)

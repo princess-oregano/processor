@@ -1,31 +1,31 @@
 dmp
-push 10
-call FUNC
+push 1
+pop rbx
+push 1
+pop rcx
+call FACT
 dmp
 out
 hlt
 
-FUNC
+FACT
 push rsp
 pop rax
-push 5
-push 7
-add
-out
-push rax
-call SEGFAULT
-pop rax
-push rax
-pop rsp
-ret
 
-SEGFAULT
-push rsp
-pop rax
-push 30
-push 2
+push rbx
+push 1
+add
+dup
+pop rbx
+push rcx
 mul
+dup
+pop rcx
 out
+
+push rax
+call FACT
+pop rax
 push rax
 pop rsp
 ret
