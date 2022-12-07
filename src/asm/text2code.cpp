@@ -8,12 +8,6 @@
 
 const double THRESHOLD = 1e-10;
 
-static bool
-are_equal(double value1, double value2)
-{
-        return (fabs(value1 - value2) < THRESHOLD);
-}
-
 ///////////////////////LABELS///////////////////////
 
 // Finds label in the array.
@@ -152,9 +146,6 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
 {
         double *cmd_array = (double *) calloc(text->num_of_lines * 2, sizeof(double));
 
-        stack_t ret_ip {};
-        stack_ctor(&ret_ip, FUNCS_NUM, VAR_INFO(ret_ip));
-
         char cmd_name[MAX_CMD_SIZE] = {};
         label_t labels[LABELS_NUM] = {};
         size_t ip = 0;
@@ -192,14 +183,11 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
 
                         if (sscanf(text->lines[line_count].first_ch +
                         strlen("CALL"), "%s", str_val) == 1) {
-                                if (!are_equal((cmd_array[ip++] =
-                                        find_label(labels, label_count, str_val)), -1)) {
-                                                stack_push(&ret_ip, (double) ip);
-                                }
+                                cmd_array[ip++] =
+                                        find_label(labels, label_count, str_val);
                         }
                 } else if(strcasecmp(cmd_name, "RET") == 0) {
                         cmd_array[ip++] = CMD_RET;
-                        stack_pop(&ret_ip, &cmd_array[ip++]);
                 } else if (strcasecmp(cmd_name, "SQRT") == 0) {
                         cmd_array[ip++] = CMD_SQRT;
                         if (sscanf(text->lines[line_count].first_ch +
@@ -239,8 +227,6 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
 
         cmd_arr->cmd_array = cmd_array;
         cmd_arr->cmd_count = ip;
-
-        stack_dtor(&ret_ip);
 }
 
 void

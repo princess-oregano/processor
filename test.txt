@@ -1,12 +1,32 @@
 dmp
 push 10
-pop rax
-push 30
-pop rax
-push 40
-push 20
-push 1
-pop rsp
+call FUNC
+dmp
 out
 hlt
+
+FUNC
+push rsp
+pop rax
+push 5
+push 7
+add
+out
+push rax
+call SEGFAULT
+pop rax
+push rax
+pop rsp
+ret
+
+SEGFAULT
+push rsp
+pop rax
+push 30
+push 2
+mul
+out
+push rax
+pop rsp
+ret
 

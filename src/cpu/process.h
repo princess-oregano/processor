@@ -3,14 +3,14 @@
 
 #include <stdio.h>
 
-#define POP(val) reg[REG_RSP] = (double) stack.size; stack_pop(&stack, &val); 
-#define PUSH(val) reg[REG_RSP] = (double) stack.size; stack_push(&stack, val);
-#define IF_PUSH(msk, dst)  if ((cmd & (msk)) == (msk)) { \
+#define POP(val) stack_pop(&stack, &val); reg[REG_RSP] = (double) stack.size; 
+#define PUSH(val) stack_push(&stack, val); reg[REG_RSP] = (double) stack.size;
+#define IF_PUSH(msk, dst) if ((cmd & (msk)) == (msk)) {  \
                                 PUSH(dst)                \
                                 ip++;                    \
                                 }                        \
                         else
-#define IF_POP(msk, dst, ...)  if ((cmd & (msk)) == (msk)) {  \
+#define IF_POP(msk, dst, ...) if ((cmd & (msk)) == (msk)) {  \
                                 POP(dst)                 \
                                 __VA_ARGS__              \
                                 ip++;                    \

@@ -53,10 +53,10 @@ execute(double *cmd_buf, size_t size)
                         DEF_CMD(POP,
                                 IF_POP((RAM_MASK | IMMED_MASK), ram[(int) cmd_buf[ip]], )
                                 IF_POP((REG_MASK | RAM_MASK), ram[(int) reg[ip]], )
-                                IF_POP((REG_MASK), reg[(int) cmd_buf[ip]],
+                                IF_POP((REG_MASK), val1,
+                                        reg[(int) cmd_buf[ip]] = val1;
                                         if ((int) cmd_buf[ip] == REG_RSP) {
                                         stack.size = (size_t) reg[REG_RSP];
-                                        fprintf(stderr, "move rsp = %lg\n", reg[REG_RSP]);
                                         })
                                 {
                                 assert(0 && "Invalid POP command.\n");
@@ -70,8 +70,8 @@ execute(double *cmd_buf, size_t size)
                         DEF_CMD(DUP, POP(val1) PUSH(val1) PUSH(val2))
                         DEF_CMD(OUT, POP(val1) printf("%lg\n", val1);)
                         DEF_CMD(JMP, ip = (size_t) cmd_buf[ip];)
-                        DEF_CMD(CALL, ip = (size_t) cmd_buf[ip];)
-                        DEF_CMD(RET, ip = (size_t) cmd_buf[ip];)
+                        DEF_CMD(CALL, PUSH((double) ip+1) ip = (size_t) cmd_buf[ip];)
+                        DEF_CMD(RET, POP(val1) ip = (size_t) val1;)
                         DEF_CMD(IN, scanf("%lf", &val1); PUSH(val1))
                         DEF_CMD(SQRT, val1 = sqrt(val1); PUSH(val1))
                         DEF_CMD(DMP & CMD_MASK, cpu_dump(cmd_buf, size, ip);)
@@ -80,7 +80,11 @@ execute(double *cmd_buf, size_t size)
 
                 }
 
-                stack_dump(stack, VAR_INFO(stack));
+                /*
+                 *fprintf(stderr, "rsp = %lg\n", reg[REG_RSP]); 
+                 *fprintf(stderr, "stack.size = %zu\n", stack.size); 
+                 */
+                 
                 cmd = (int) cmd_buf[ip];
         }
 
