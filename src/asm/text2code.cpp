@@ -210,6 +210,8 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
                 CMD(DMP)
                 CMD(DUP)
                 CMD(IN)
+                CMD(SIN)
+                CMD(COS)
                 CMD(HLT)
                 {
                         if (find_label(labels, label_count, cmd_name) == -1) {
@@ -317,6 +319,12 @@ write_listing(cmd_arr_t cmd_arr)
                                 break;
                         case CMD_SQRT:
                                 fprintf(list, "SQRT");
+                                break;
+                        case CMD_SIN:
+                                fprintf(list, "SIN");
+                                break;
+                        case CMD_COS:
+                                fprintf(list, "COS");
                                 break;
                         case CMD_DMP & CMD_MASK:
                                 fprintf(list, "DMP");

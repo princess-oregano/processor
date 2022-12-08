@@ -22,6 +22,8 @@ enum cmd_t {
         CMD_JAE  = 17,
         CMD_JBE  = 18,
         CMD_JNE  = 19,
+        CMD_SIN  = 20,
+        CMD_COS  = 21,
         CMD_DMP  = -1,
 };
 

@@ -42,6 +42,7 @@ execute(double *cmd_buf, size_t size)
         
         double reg[N_REG] = {};
         double ram[N_RAM] = {};
+        double vram[VRAM_X*VRAM_Y] = {};
 
         stack_ctor(&stack, DEF_STACK_CAPACITY, VAR_INFO(stack));
 
@@ -89,6 +90,8 @@ execute(double *cmd_buf, size_t size)
                         DEF_CMD(RET, POP(val1) ip = (size_t) val1;)
                         DEF_CMD(IN, scanf("%lf", &val1); PUSH(val1))
                         DEF_CMD(SQRT, POP(val1) val1 = sqrt(val1); PUSH(val1))
+                        DEF_CMD(SIN, POP(val1) PUSH(sin(val1)))
+                        DEF_CMD(COS, POP(val1) PUSH(cos(val1)))
                         DEF_CMD(DMP & CMD_MASK, cpu_dump(cmd_buf, size, ip);)
                         default:
                                 assert(0 && "Invalid command.\n");

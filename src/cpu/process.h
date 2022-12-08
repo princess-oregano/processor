@@ -20,6 +20,8 @@
 
 const int N_REG = 16;
 const int N_RAM = 300;
+const int VRAM_X = 80;
+const int VRAM_Y = 20;
 
 void
 execute(double *cmd_buf, size_t size);
