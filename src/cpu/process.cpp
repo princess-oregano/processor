@@ -6,6 +6,14 @@
 #include "process.h"
 #include "../stack.h"
 
+static const double THRESHOLD = 10e-6;
+
+static bool 
+are_equal(double value1, double value2)
+{
+        return (fabs(value1 - value2) < THRESHOLD);
+}
+
 static void
 cpu_dump(double *cmd_buf, size_t cmd_count, size_t ip)
 {
@@ -71,6 +79,12 @@ execute(double *cmd_buf, size_t size)
                         DEF_CMD(DUP, POP(val1) PUSH(val1) PUSH(val1))
                         DEF_CMD(OUT, POP(val1) printf("%lg\n", val1);)
                         DEF_CMD(JMP, ip = (size_t) cmd_buf[ip];)
+                        DEF_CMD(JA, POP(val1) POP(val2) if (val1 > val2) ip = (size_t) cmd_buf[ip]; else ip++;)
+                        DEF_CMD(JB, POP(val1) POP(val2) if (val1 < val2) ip = (size_t) cmd_buf[ip]; else ip++;)
+                        DEF_CMD(JE, POP(val1) POP(val2) if (are_equal(val1, val2)) ip = (size_t) cmd_buf[ip]; else ip++;)
+                        DEF_CMD(JAE, POP(val1) POP(val2) if (val1 >= val2) ip = (size_t) cmd_buf[ip]; else ip++;)
+                        DEF_CMD(JBE, POP(val1) POP(val2) if (val1 <= val2) ip = (size_t) cmd_buf[ip]; else ip++;)
+                        DEF_CMD(JNE, POP(val1) POP(val2) if (!are_equal(val1, val2)) ip = (size_t) cmd_buf[ip]; else ip++;)
                         DEF_CMD(CALL, PUSH((double) ip+1) ip = (size_t) cmd_buf[ip];)
                         DEF_CMD(RET, POP(val1) ip = (size_t) val1;)
                         DEF_CMD(IN, scanf("%lf", &val1); PUSH(val1))

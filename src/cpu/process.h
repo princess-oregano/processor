@@ -18,8 +18,8 @@
                         else
 #define DEF_CMD(name, ...) case CMD_##name: ip++; __VA_ARGS__ break;
 
-const int N_REG = 5;
-const int N_RAM = 15;
+const int N_REG = 16;
+const int N_RAM = 300;
 
 void
 execute(double *cmd_buf, size_t size);

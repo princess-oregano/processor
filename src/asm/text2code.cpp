@@ -65,28 +65,41 @@ label_dump(label_t *labels, size_t size)
 
 ///////////////////END_LABELS///////////////////////
 
+#define REG(arg) if(strncasecmp(reg, #arg, 3) == 0) { \
+                val = REG_##arg;                      \
+                }\
+        else 
 
 static int
 gen_reg(char *reg)
 {
         int val = 777;
 
-        if (strncasecmp(reg, "RSP", 3) == 0) {
-                val = REG_RSP;
-        } else if (strncasecmp(reg, "RAX", 3) == 0) {
-                val = REG_RAX;
-        } else if (strncasecmp(reg, "RBX", 3) == 0) {
-                val = REG_RBX;
-        } else if (strncasecmp(reg, "RCX", 3) == 0) {
-                val = REG_RCX;
-        } else if (strncasecmp(reg, "RDX", 3) == 0) {
-                val = REG_RDX;
-        } else {
+        REG(RSP)
+        REG(RAX)
+        REG(RBX)
+        REG(RCX)
+        REG(RDX)
+        REG(REX)
+        REG(RFX)
+        REG(RGX)
+        REG(RHX)
+        REG(RIX)
+        REG(RJX)
+        REG(RKX)
+        REG(RLX)
+        REG(RMX)
+        REG(RNX)
+        REG(ROX)
+        REG(RPX)
+        {
                 log("Invalid usage: unknown argument.\n");
         }
 
         return val;
 }
+
+#undef REG
 
 static void
 gen_push(char *buf, double *cmd_array, size_t *ip)
@@ -164,20 +177,14 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
                                         strlen("PUSH"), cmd_array, &ip);
                 } else if (strcasecmp(cmd_name, "POP") == 0) {
                         gen_pop(text->lines[line_count].first_ch + 
-                                        strlen("PUSH"), cmd_array, &ip);
-                } else if (strcasecmp(cmd_name, "JMP") == 0) {
-                        cmd_array[ip++] = CMD_JMP;
-
-                        if (sscanf(text->lines[line_count].first_ch +
-                        strlen("JMP"), " %c%lf", &c, &val) == 2
-                        && c == ':') {
-                                cmd_array[ip++] = val;
-                        } else if (sscanf(text->lines[line_count].first_ch +
-                        strlen("JMP"), " %c%s", &c, str_val) == 2
-                        && c == ':') {
-                                cmd_array[ip++] =
-                                find_label(labels, label_count, str_val);
-                        }
+                                        strlen("POP"), cmd_array, &ip);
+                JUMP(JMP)
+                JUMP(JA)
+                JUMP(JB)
+                JUMP(JE)
+                JUMP(JAE)
+                JUMP(JBE)
+                JUMP(JNE)
                 } else if(strcasecmp(cmd_name, "CALL") == 0) {
                         cmd_array[ip++] = CMD_CALL;
 
@@ -250,6 +257,30 @@ write_listing(cmd_arr_t cmd_arr)
                                 break;
                         case CMD_JMP:
                                 fprintf(list, "JMP");
+                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
+                                break;
+                        case CMD_JA:
+                                fprintf(list, "JA");
+                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
+                                break;
+                        case CMD_JB:
+                                fprintf(list, "JB");
+                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
+                                break;
+                        case CMD_JE:
+                                fprintf(list, "JE");
+                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
+                                break;
+                        case CMD_JAE:
+                                fprintf(list, "JAE");
+                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
+                                break;
+                        case CMD_JBE:
+                                fprintf(list, "JBE");
+                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
+                                break;
+                        case CMD_JNE:
+                                fprintf(list, "JNE");
                                 fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
                                 break;
                         case CMD_CALL:
