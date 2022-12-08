@@ -88,7 +88,7 @@ execute(double *cmd_buf, size_t size)
                         DEF_CMD(CALL, PUSH((double) ip+1) ip = (size_t) cmd_buf[ip];)
                         DEF_CMD(RET, POP(val1) ip = (size_t) val1;)
                         DEF_CMD(IN, scanf("%lf", &val1); PUSH(val1))
-                        DEF_CMD(SQRT, val1 = sqrt(val1); PUSH(val1))
+                        DEF_CMD(SQRT, POP(val1) val1 = sqrt(val1); PUSH(val1))
                         DEF_CMD(DMP & CMD_MASK, cpu_dump(cmd_buf, size, ip);)
                         default:
                                 assert(0 && "Invalid command.\n");

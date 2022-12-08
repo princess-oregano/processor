@@ -1,0 +1,59 @@
+; get coeffs
+in
+pop rax
+in
+pop rbx
+in
+pop rcx
+
+; compute discriminant
+push 4
+push rax
+push rcx
+mul
+mul
+push rbx
+push rbx
+mul
+sub
+pop rdx
+
+; check if solutions are real
+push rdx
+push 0
+ja :UNREAL
+
+; get sols
+push rdx
+sqrt
+push rbx
+push 0
+sub
+sub
+push 2
+push rax
+mul
+div
+out
+
+push rdx
+sqrt
+push 0
+sub
+push rbx
+push 0
+sub
+sub
+push 2
+push rax
+mul
+div
+out
+
+hlt
+
+UNREAL:
+push 666
+out
+hlt
+
