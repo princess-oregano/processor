@@ -1,0 +1,74 @@
+; compute coordinates of the center of the screen
+        push 40
+        push 2
+        div
+        pop rcx
+
+        push 20
+        push 2
+        div
+        pop rdx
+
+; push radius of the circle
+        push 9
+        pop rex
+
+; start drawing circle
+        push 0.0
+        pop rfx  ; angle
+
+        push 6.283185307
+        pop rgx ; 2 * pi
+
+        call CIRCLE
+        pic
+
+        hlt
+
+;//////////////////////////////////
+CIRCLE
+        push rsp
+        pop rax
+
+; end function if angle is more than 2pi
+        push rfx
+        push rgx 
+
+        jbe :BACK
+
+        push rex
+        push rfx
+        sin
+        mul
+        dup
+        out
+        push rdx
+        sub
+
+        push rex
+        push rfx
+        cos
+        mul
+        dup
+        out
+        push 2
+        mul
+        push rcx
+        add
+
+        pon
+
+        push rfx
+        push 0.01
+        add
+        pop rfx
+
+        push rax
+        call CIRCLE
+        pop rax
+
+        BACK:
+                push rax
+                pop rsp
+                ret
+

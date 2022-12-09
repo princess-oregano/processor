@@ -21,8 +21,8 @@
 const int N_REG = 16;
 const int N_RAM = 300;
 // Resolution of screen.
-const int RESOL_X = 20;
-const int RESOL_Y = 10;
+const int RESOL_X = 40;
+const int RESOL_Y = 20;
 
 void
 execute(double *cmd_buf, size_t size);

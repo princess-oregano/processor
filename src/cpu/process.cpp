@@ -41,7 +41,7 @@ draw_vram(double *vram)
                         if (are_equal(vram[i*RESOL_X + j], 1))
                                 printf("*");
                         else
-                                printf("0");
+                                printf(" ");
                 }
                 printf("\n");
         }
@@ -64,7 +64,9 @@ execute(double *cmd_buf, size_t size)
 
         bool halt = false;
         while (ip < size && !halt) {
-                usleep(10000);
+                /*
+                 *usleep(10000);
+                 */
                 int cmd = (int) cmd_buf[ip];
                 switch (cmd & CMD_MASK) {
                         DEF_CMD(PUSH, 

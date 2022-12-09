@@ -65,7 +65,7 @@ label_dump(label_t *labels, size_t size)
 
 ///////////////////END_LABELS///////////////////////
 
-#define REG(arg) if(strncasecmp(reg, #arg, 3) == 0) { \
+#define DEF_REG(arg) if(strncasecmp(reg, #arg, 3) == 0) { \
                 val = REG_##arg;                      \
                 }\
         else 
@@ -75,23 +75,7 @@ gen_reg(char *reg)
 {
         int val = 777;
 
-        REG(RSP)
-        REG(RAX)
-        REG(RBX)
-        REG(RCX)
-        REG(RDX)
-        REG(REX)
-        REG(RFX)
-        REG(RGX)
-        REG(RHX)
-        REG(RIX)
-        REG(RJX)
-        REG(RKX)
-        REG(RLX)
-        REG(RMX)
-        REG(RNX)
-        REG(ROX)
-        REG(RPX)
+        #include "../regs.inc"
         {
                 log("Invalid usage: unknown argument.\n");
         }
@@ -99,7 +83,7 @@ gen_reg(char *reg)
         return val;
 }
 
-#undef REG
+#undef DEF_REG
 
 static void
 gen_push(char *buf, double *cmd_array, size_t *ip)
