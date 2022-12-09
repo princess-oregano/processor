@@ -5,27 +5,12 @@
 #include "../text.h"
 #include "../cmd.h"
 
-#define CMD(name) if (strcasecmp(cmd_name, #name) == 0) { \
-                        cmd_array[ip++] = CMD_##name;       \
-                  } else
 #define IF(cmd, spec, val, masks, adr)           \
 if (sscanf(text->lines[line_count].first_ch +    \
 strlen(#cmd), #spec, val) == 1) {                \
         cmd_array[ip++] = CMD_##cmd |(masks);    \
         cmd_array[ip++] = (adr);                 \
 } else
-#define JUMP(cmd) } else if (strcasecmp(cmd_name, #cmd) == 0) { \
-                        cmd_array[ip++] = CMD_##cmd;               \
-                        if (sscanf(text->lines[line_count].first_ch + \
-                        strlen(#cmd), " %c%lf", &c, &val) == 2 \
-                        && c == ':') {  \
-                                cmd_array[ip++] = val; \
-                        } else if (sscanf(text->lines[line_count].first_ch + \
-                        strlen(#cmd), " %c%s", &c, str_val) == 2 \
-                        && c == ':') { \
-                                cmd_array[ip++] = \
-                                find_label(labels, label_count, str_val); \
-                        }
 
 const size_t MAX_CMD_SIZE = 40;
 const int LABELS_NUM = 50;

@@ -48,6 +48,22 @@ draw_vram(double *vram)
         printf("\n");
 }
 
+#define POP(val) stack_pop(&stack, &val); reg[REG_RSP] = (double) stack.size; 
+#define PUSH(val) stack_push(&stack, val); reg[REG_RSP] = (double) stack.size;
+#define IF_PUSH(msk, dst) if ((cmd & (msk)) == (msk)) {  \
+                                PUSH(dst)                \
+                                ip++;                    \
+                                }                        \
+                        else
+#define IF_POP(msk, dst, ...) if ((cmd & (msk)) == (msk)) {  \
+                                POP(dst)                 \
+                                __VA_ARGS__              \
+                                ip++;                    \
+                                }                        \
+                        else
+#define DEF_CMD(name, ...) case CMD_##name: ip++; __VA_ARGS__ break;
+#define DEF_JMP(name, ...) case CMD_##name: ip++; __VA_ARGS__ break;
+
 void
 execute(double *cmd_buf, size_t size)
 {
@@ -90,32 +106,9 @@ execute(double *cmd_buf, size_t size)
                                 assert(0 && "Invalid POP command.\n");
                                 }
                                )
-                        DEF_CMD(HLT, halt = true;)
-                        DEF_CMD(ADD, POP(val1) POP(val2) PUSH(val1 + val2))
-                        DEF_CMD(SUB, POP(val1) POP(val2) PUSH(val1 - val2))
-                        DEF_CMD(MUL, POP(val1) POP(val2) PUSH(val1 * val2))
-                        DEF_CMD(DIV, POP(val1) POP(val2) PUSH(val2 / val1))
-                        DEF_CMD(DUP, POP(val1) PUSH(val1) PUSH(val1))
-                        DEF_CMD(OUT, POP(val1) printf("%lg\n", val1);)
-                        DEF_CMD(JMP, ip = (size_t) cmd_buf[ip];)
-                        DEF_CMD(JA, POP(val1) POP(val2) if (val1 > val2) ip = (size_t) cmd_buf[ip]; else ip++;)
-                        DEF_CMD(JB, POP(val1) POP(val2) if (val1 < val2) ip = (size_t) cmd_buf[ip]; else ip++;)
-                        DEF_CMD(JE, POP(val1) POP(val2) if (are_equal(val1, val2)) ip = (size_t) cmd_buf[ip]; else ip++;)
-                        DEF_CMD(JAE, POP(val1) POP(val2) if (val1 >= val2) ip = (size_t) cmd_buf[ip]; else ip++;)
-                        DEF_CMD(JBE, POP(val1) POP(val2) if (val1 <= val2) ip = (size_t) cmd_buf[ip]; else ip++;)
-                        DEF_CMD(JNE, POP(val1) POP(val2) if (!are_equal(val1, val2)) ip = (size_t) cmd_buf[ip]; else ip++;)
-                        DEF_CMD(CALL, PUSH((double) ip+1) ip = (size_t) cmd_buf[ip];)
-                        DEF_CMD(RET, POP(val1) ip = (size_t) val1;)
-                        DEF_CMD(IN, scanf("%lf", &val1); PUSH(val1))
-                        DEF_CMD(SQRT, POP(val1) val1 = sqrt(val1); PUSH(val1))
-                        DEF_CMD(SIN, POP(val1) PUSH(sin(val1)))
-                        DEF_CMD(COS, POP(val1) PUSH(cos(val1)))
-                        DEF_CMD(PON, POP(val1) POP(val2)
-                                        vram[((int) val2-1)*RESOL_X + ((int) val1 - 1)] = 1;
-                                )
-                        DEF_CMD(CLN, memset(vram, 0, sizeof(int)*RESOL_X*RESOL_Y);)
-                        DEF_CMD(PIC, draw_vram(vram);)
-                        DEF_CMD(DMP & CMD_MASK, cpu_dump(cmd_buf, size, ip);)
+
+                        #include "../cmds.inc"
+
                         default:
                                 assert(0 && "Invalid command.\n");
 
@@ -131,4 +124,11 @@ execute(double *cmd_buf, size_t size)
 
         stack_dtor(&stack);
 }
+
+#undef POP
+#undef PUSH
+#undef IF_PUSH
+#undef IF_POP
+#undef DEF_CMD
+#undef DEF_JMP
 

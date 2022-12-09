@@ -144,6 +144,19 @@ gen_pop(char *buf, double *cmd_array, size_t *ip)
         }
 }
 
+#define DEF_CMD(name, ...) if (strcasecmp(cmd_name, #name) == 0) { \
+                        cmd_array[ip++] = CMD_##name;       \
+                  } else
+#define DEF_JMP(cmd, ...) if (strcasecmp(cmd_name, #cmd) == 0) { \
+                        cmd_array[ip++] = CMD_##cmd;               \
+                        if (sscanf(text->lines[line_count].first_ch + \
+                        strlen(#cmd), " %c%s", &c, str_val) == 2 \
+                        && c == ':') { \
+                                cmd_array[ip++] = \
+                                find_label(labels, label_count, str_val); \
+                        }    \
+                } else
+
 void
 generate(text_t *text, cmd_arr_t *cmd_arr)
 {
@@ -155,7 +168,6 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
         size_t  line_count = 0;
         size_t label_count = 0;
         char str_val[40] = {};
-        double val = 0;
         char c = 0;
 
         int cycle_count = 0;
@@ -168,44 +180,8 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
                 } else if (strcasecmp(cmd_name, "POP") == 0) {
                         gen_pop(text->lines[line_count].first_ch + 
                                         strlen("POP"), cmd_array, &ip);
-                JUMP(JMP)
-                JUMP(JA)
-                JUMP(JB)
-                JUMP(JE)
-                JUMP(JAE)
-                JUMP(JBE)
-                JUMP(JNE)
-                } else if(strcasecmp(cmd_name, "CALL") == 0) {
-                        cmd_array[ip++] = CMD_CALL;
-
-                        if (sscanf(text->lines[line_count].first_ch +
-                        strlen("CALL"), "%s", str_val) == 1) {
-                                cmd_array[ip++] =
-                                        find_label(labels, label_count, str_val);
-                        }
-                } else if(strcasecmp(cmd_name, "RET") == 0) {
-                        cmd_array[ip++] = CMD_RET;
-                } else if (strcasecmp(cmd_name, "SQRT") == 0) {
-                        cmd_array[ip++] = CMD_SQRT;
-                        if (sscanf(text->lines[line_count].first_ch +
-                        strlen("SQRT"), "%lf", &val) == 1) {
-                                cmd_array[ip++] = val;
-                        }
                 } else
-                CMD(ADD)
-                CMD(SUB)
-                CMD(MUL)
-                CMD(DIV)
-                CMD(OUT)
-                CMD(DMP)
-                CMD(DUP)
-                CMD(IN)
-                CMD(SIN)
-                CMD(COS)
-                CMD(PIC)
-                CMD(PON)
-                CMD(CLN)
-                CMD(HLT)
+                #include "../cmds.inc"
                 {
                         if (find_label(labels, label_count, cmd_name) == -1) {
                                 if (cycle_count > 0) {
@@ -230,6 +206,9 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
         cmd_arr->cmd_array = cmd_array;
         cmd_arr->cmd_count = ip;
 }
+
+#undef DEF_CMD
+#undef DEF_JMP
 
 void
 write_listing(cmd_arr_t cmd_arr)
