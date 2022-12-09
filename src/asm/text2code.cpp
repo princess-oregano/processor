@@ -35,8 +35,14 @@ static void
 make_label(label_t *labels, size_t ip, size_t *size, char *str)
 {
         size_t len = strlen(str);
-        if (str[len - 1] == ':')
+        if (str[len - 1] == ':') {
                 len--;
+        }
+        else {
+                log("Invalid usage: colon expected after label.\n");
+                return;
+        }
+                
 
         len = (len < LABEL_SIZE) ? len : LABEL_SIZE;
 

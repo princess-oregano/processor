@@ -1,37 +1,41 @@
-push 1
-pop rbx
-push 1
-pop rcx
-in
-pop rdx
-call FACT
-push rcx
-out
-hlt
+        push 1
+        pop rbx
+        push 1
+        pop rcx
 
-FACT
-push rsp
-pop rax
+        in
+        pop rdx
 
-push rbx
-push 1
-add
-dup
-pop rbx
-push rcx
-mul
-dup
-pop rcx
-push rbx
-push rdx
-je :BACK
+        call FACT
 
-push rax
-call FACT
-pop rax
+        push rcx
+        out
 
-BACK:
-push rax
-pop rsp
-ret
+        hlt
+
+FACT:
+        push rsp
+        pop rax
+
+        push rbx
+        push 1
+        add
+        dup
+        pop rbx
+        push rcx
+        mul
+        dup
+        pop rcx
+        push rbx
+        push rdx
+        je :BACK
+
+        push rax
+        call FACT
+        pop rax
+
+        BACK:
+                push rax
+                pop rsp
+                ret
 
