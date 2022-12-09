@@ -1,3 +1,4 @@
+#include <cstring>
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
@@ -32,6 +33,21 @@ cpu_dump(double *cmd_buf, size_t cmd_count, size_t ip)
         printf("^\n");
 }
 
+static void
+draw_vram(double *vram)
+{
+        for (int i = 0; i < RESOL_Y; i++) {
+                for (int j = 0; j < RESOL_X; j++) {
+                        if (are_equal(vram[i*RESOL_X + j], 1))
+                                printf("*");
+                        else
+                                printf("0");
+                }
+                printf("\n");
+        }
+        printf("\n");
+}
+
 void
 execute(double *cmd_buf, size_t size)
 {
@@ -42,7 +58,7 @@ execute(double *cmd_buf, size_t size)
         
         double reg[N_REG] = {};
         double ram[N_RAM] = {};
-        double vram[VRAM_X*VRAM_Y] = {};
+        double vram[RESOL_X*RESOL_Y] = {};
 
         stack_ctor(&stack, DEF_STACK_CAPACITY, VAR_INFO(stack));
 
@@ -92,6 +108,11 @@ execute(double *cmd_buf, size_t size)
                         DEF_CMD(SQRT, POP(val1) val1 = sqrt(val1); PUSH(val1))
                         DEF_CMD(SIN, POP(val1) PUSH(sin(val1)))
                         DEF_CMD(COS, POP(val1) PUSH(cos(val1)))
+                        DEF_CMD(PON, POP(val1) POP(val2)
+                                        vram[((int) val2-1)*RESOL_X + ((int) val1 - 1)] = 1;
+                                )
+                        DEF_CMD(CLN, memset(vram, 0, sizeof(int)*RESOL_X*RESOL_Y);)
+                        DEF_CMD(PIC, draw_vram(vram);)
                         DEF_CMD(DMP & CMD_MASK, cpu_dump(cmd_buf, size, ip);)
                         default:
                                 assert(0 && "Invalid command.\n");

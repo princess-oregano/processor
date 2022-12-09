@@ -212,6 +212,9 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
                 CMD(IN)
                 CMD(SIN)
                 CMD(COS)
+                CMD(PIC)
+                CMD(PON)
+                CMD(CLN)
                 CMD(HLT)
                 {
                         if (find_label(labels, label_count, cmd_name) == -1) {
@@ -325,6 +328,17 @@ write_listing(cmd_arr_t cmd_arr)
                                 break;
                         case CMD_COS:
                                 fprintf(list, "COS");
+                                break;
+                        case CMD_PON:
+                                fprintf(list, "COS");
+                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
+                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
+                                break;
+                        case CMD_CLN:
+                                fprintf(list, "CLN");
+                                break;
+                        case CMD_PIC:
+                                fprintf(list, "PIC");
                                 break;
                         case CMD_DMP & CMD_MASK:
                                 fprintf(list, "DMP");

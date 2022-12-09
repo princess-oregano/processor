@@ -20,8 +20,9 @@
 
 const int N_REG = 16;
 const int N_RAM = 300;
-const int VRAM_X = 80;
-const int VRAM_Y = 20;
+// Resolution of screen.
+const int RESOL_X = 20;
+const int RESOL_Y = 10;
 
 void
 execute(double *cmd_buf, size_t size);

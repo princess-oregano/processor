@@ -2,29 +2,32 @@
 #define CMD_H
 
 enum cmd_t {
-        CMD_HLT  = 0,
-        CMD_PUSH = 1,
-        CMD_POP  = 2,
-        CMD_ADD  = 3,
-        CMD_SUB  = 4,
-        CMD_MUL  = 5,
-        CMD_DIV  = 6,
-        CMD_OUT  = 7,
-        CMD_JMP  = 8,
-        CMD_DUP  = 9,
-        CMD_IN   = 10,
-        CMD_SQRT = 11,
-        CMD_CALL = 12,
-        CMD_RET  = 13,
-        CMD_JA   = 14,
-        CMD_JB   = 15,
-        CMD_JE   = 16, 
-        CMD_JAE  = 17,
-        CMD_JBE  = 18,
-        CMD_JNE  = 19,
-        CMD_SIN  = 20,
-        CMD_COS  = 21,
-        CMD_DMP  = -1,
+        CMD_HLT  = 0,  // Halt the program.
+        CMD_PUSH = 1,  // Push value to stack.
+        CMD_POP  = 2,  // Pop value from stack.
+        CMD_ADD  = 3,  // Add values.
+        CMD_SUB  = 4,  // Substract values.
+        CMD_MUL  = 5,  // Multiplicate values.
+        CMD_DIV  = 6,  // Divide values.
+        CMD_OUT  = 7,  // Pop value from stack and print it.
+        CMD_JMP  = 8,  // Jump to label.
+        CMD_DUP  = 9,  // Duplicate the upper value in stack.
+        CMD_IN   = 10, // Scan value from stdin, push it to stack.
+        CMD_SQRT = 11, // Pop value from a stack, push it's square root.
+        CMD_CALL = 12, // Call function.
+        CMD_RET  = 13, // Return to a function.
+        CMD_JA   = 14, // Conditinal jumps.
+        CMD_JB   = 15, // 
+        CMD_JE   = 16, //  
+        CMD_JAE  = 17, // 
+        CMD_JBE  = 18, // 
+        CMD_JNE  = 19, // 
+        CMD_SIN  = 20, // Take sin.
+        CMD_COS  = 21, // Take cos.
+        CMD_PON  = 22, // Set pixel on.
+        CMD_PIC  = 23, // Print picture(taken from VRAM).
+        CMD_CLN  = 24, // Clean screen.
+        CMD_DMP  = -1, // Dump processor.
 };
 
 #include <stdio.h>
