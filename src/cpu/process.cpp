@@ -7,7 +7,7 @@
 #include "process.h"
 #include "../stack.h"
 
-static const double THRESHOLD = 10e-6;
+static const double THRESHOLD = 1e-6;
 
 static bool 
 are_equal(double value1, double value2)
@@ -114,11 +114,6 @@ execute(double *cmd_buf, size_t size)
 
                 }
 
-                /*
-                 *fprintf(stderr, "rsp = %lg\n", reg[REG_RSP]); 
-                 *fprintf(stderr, "stack.size = %zu\n", stack.size); 
-                 */
-                 
                 cmd = (int) cmd_buf[ip];
         }
 

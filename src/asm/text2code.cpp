@@ -210,6 +210,14 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
 #undef DEF_CMD
 #undef DEF_JMP
 
+#define DEF_CMD(cmd, ...) case CMD_##cmd:  \
+                     fprintf(list, #cmd);  \
+                     break;
+#define DEF_JMP(cmd, ...) case CMD_##cmd:  \
+                fprintf(list, #cmd);  \
+                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);  \
+                break;
+
 void
 write_listing(cmd_arr_t cmd_arr)
 {
@@ -229,89 +237,7 @@ write_listing(cmd_arr_t cmd_arr)
                                 fprintf(list, "POP");
                                 fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
                                 break;
-                        case CMD_JMP:
-                                fprintf(list, "JMP");
-                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
-                                break;
-                        case CMD_JA:
-                                fprintf(list, "JA");
-                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
-                                break;
-                        case CMD_JB:
-                                fprintf(list, "JB");
-                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
-                                break;
-                        case CMD_JE:
-                                fprintf(list, "JE");
-                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
-                                break;
-                        case CMD_JAE:
-                                fprintf(list, "JAE");
-                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
-                                break;
-                        case CMD_JBE:
-                                fprintf(list, "JBE");
-                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
-                                break;
-                        case CMD_JNE:
-                                fprintf(list, "JNE");
-                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
-                                break;
-                        case CMD_CALL:
-                                fprintf(list, "CALL");
-                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
-                                break;
-                        case CMD_RET:
-                                fprintf(list, "RET");
-                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
-                                break;
-                        case CMD_HLT:
-                                fprintf(list, "HLT");
-                                break;
-                        case CMD_ADD:
-                                fprintf(list, "ADD");
-                                break;
-                        case CMD_SUB:
-                                fprintf(list, "SUB");
-                                break;
-                        case CMD_MUL:
-                                fprintf(list, "MUL");
-                                break;
-                        case CMD_DIV:
-                                fprintf(list, "DIV");
-                                break;
-                        case CMD_OUT:
-                                fprintf(list, "OUT");
-                                break;
-                        case CMD_DUP:
-                                fprintf(list, "DUP");
-                                break;
-                        case CMD_IN:
-                                fprintf(list, "IN");
-                                break;
-                        case CMD_SQRT:
-                                fprintf(list, "SQRT");
-                                break;
-                        case CMD_SIN:
-                                fprintf(list, "SIN");
-                                break;
-                        case CMD_COS:
-                                fprintf(list, "COS");
-                                break;
-                        case CMD_PON:
-                                fprintf(list, "COS");
-                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
-                                fprintf(list, " %lg", cmd_arr.cmd_array[ip++]);
-                                break;
-                        case CMD_CLN:
-                                fprintf(list, "CLN");
-                                break;
-                        case CMD_PIC:
-                                fprintf(list, "PIC");
-                                break;
-                        case CMD_DMP & CMD_MASK:
-                                fprintf(list, "DMP");
-                                break;
+                        #include "../cmds.inc"
                         default:
                                 assert(0 && "Invalid usage.");
                                 break;
@@ -321,4 +247,7 @@ write_listing(cmd_arr_t cmd_arr)
 
         fprintf(list, "\n");
 }
+
+#undef DEF_CMD
+#undef DEF_JMP
 
