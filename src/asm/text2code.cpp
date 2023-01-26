@@ -42,7 +42,7 @@ make_label(label_t *labels, size_t ip, size_t *size, char *str)
                 log("Invalid usage: colon expected after label.\n");
                 return;
         }
-                
+
 
         len = (len < LABEL_SIZE) ? len : LABEL_SIZE;
 
@@ -53,7 +53,7 @@ make_label(label_t *labels, size_t ip, size_t *size, char *str)
         *size += 1;
 }
 
-// Dumps info about labels.  
+// Dumps info about labels.
 [[maybe_unused]]
 static void
 label_dump(label_t *labels, size_t size)
@@ -74,7 +74,7 @@ label_dump(label_t *labels, size_t size)
 #define DEF_REG(arg) if(strncasecmp(reg, #arg, 3) == 0) { \
                 val = REG_##arg;                      \
                 }\
-        else 
+        else
 
 static int
 gen_reg(char *reg)
@@ -94,24 +94,25 @@ gen_reg(char *reg)
 static void
 gen_push(char *buf, double *cmd_array, size_t *ip)
 {
+
         double val = 0;
         char str_val[40] = "";
         if (sscanf(buf, "%lf", &val) == 1) {
                 cmd_array[(*ip)++] = CMD_PUSH | (IMMED_MASK);
                 cmd_array[(*ip)++] = val;
-        } else if (sscanf(buf, "[%lf]", &val) == 1) {
+        } else if (sscanf(buf, " [ %lf ] ", &val) == 1) {
                 cmd_array[(*ip)++] = CMD_PUSH | (IMMED_MASK | RAM_MASK);
                 cmd_array[(*ip)++] = val;
-        } else if (sscanf(buf, "%s", str_val) == 1) {
-                cmd_array[(*ip)++] = CMD_PUSH | (REG_MASK);
-                cmd_array[(*ip)++] = gen_reg(str_val);
-        } else if (sscanf(buf, "[%s]", str_val) == 1) {
-                cmd_array[(*ip)++] = CMD_PUSH | (REG_MASK | IMMED_MASK);
-                cmd_array[(*ip)++] = gen_reg(str_val);
-        } else if (sscanf(buf, "[%lg+%s]", &val, str_val) == 1) {
+        } else if (sscanf(buf, " [ %s + %lf ] ", str_val, &val) == 2) {
                 cmd_array[(*ip)++] = CMD_PUSH |
                         (IMMED_MASK | REG_MASK | RAM_MASK);
                 cmd_array[(*ip)++] = val;
+                cmd_array[(*ip)++] = gen_reg(str_val);
+        } else if (sscanf(buf, " [ %s ] ", str_val) == 1) {
+                cmd_array[(*ip)++] = CMD_PUSH | (REG_MASK | RAM_MASK);
+                cmd_array[(*ip)++] = gen_reg(str_val);
+        } else if (sscanf(buf, "%s", str_val) == 1) {
+                cmd_array[(*ip)++] = CMD_PUSH | (REG_MASK);
                 cmd_array[(*ip)++] = gen_reg(str_val);
         } else {
                 log("Error: invalid PUSH usage.\n");
@@ -124,19 +125,19 @@ gen_pop(char *buf, double *cmd_array, size_t *ip)
 {
         double val = 0;
         char str_val[40] = "";
-        if (sscanf(buf, "[%lf]", &val) == 1) {
+        if (sscanf(buf, " [ %lf ] ", &val) == 1) {
                 cmd_array[(*ip)++] = CMD_POP | (IMMED_MASK | RAM_MASK);
                 cmd_array[(*ip)++] = val;
-        } else if (sscanf(buf, "%s", str_val) == 1) {
-                cmd_array[(*ip)++] = CMD_POP | (REG_MASK);
-                cmd_array[(*ip)++] = gen_reg(str_val);
-        } else if (sscanf(buf, "[%s]", str_val) == 1) {
-                cmd_array[(*ip)++] = CMD_POP | (REG_MASK | IMMED_MASK);
-                cmd_array[(*ip)++] = gen_reg(str_val);
-        } else if (sscanf(buf, "[%lg+%s]", &val, str_val) == 1) {
+        } else if (sscanf(buf, " [ %s + %lf ] ", str_val, &val) == 2) {
                 cmd_array[(*ip)++] = CMD_POP |
                         (IMMED_MASK | REG_MASK | RAM_MASK);
                 cmd_array[(*ip)++] = val;
+                cmd_array[(*ip)++] = gen_reg(str_val);
+        } else if (sscanf(buf, " [ %s ] ", str_val) == 1) {
+                cmd_array[(*ip)++] = CMD_POP | (REG_MASK | RAM_MASK);
+                cmd_array[(*ip)++] = gen_reg(str_val);
+        } else if (sscanf(buf, " %s ", str_val) == 1) {
+                cmd_array[(*ip)++] = CMD_POP | (REG_MASK);
                 cmd_array[(*ip)++] = gen_reg(str_val);
         } else {
                 log("Error: invalid PUSH usage.\n");
@@ -175,10 +176,10 @@ generate(text_t *text, cmd_arr_t *cmd_arr)
                 sscanf(text->lines[line_count].first_ch, "%s", cmd_name);
 
                 if (strcasecmp(cmd_name, "PUSH") == 0) {
-                        gen_push(text->lines[line_count].first_ch + 
+                        gen_push(text->lines[line_count].first_ch +
                                         strlen("PUSH"), cmd_array, &ip);
                 } else if (strcasecmp(cmd_name, "POP") == 0) {
-                        gen_pop(text->lines[line_count].first_ch + 
+                        gen_pop(text->lines[line_count].first_ch +
                                         strlen("POP"), cmd_array, &ip);
                 } else
                 #include "../cmds.inc"
