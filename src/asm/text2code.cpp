@@ -161,7 +161,7 @@ gen_pop(char *buf, double *cmd_array, size_t *ip)
 void
 generate(text_t *text, cmd_arr_t *cmd_arr)
 {
-        double *cmd_array = (double *) calloc(text->num_of_lines * 2, sizeof(double));
+        double *cmd_array = (double *) calloc(text->num_of_lines * 3, sizeof(double));
 
         char cmd_name[MAX_CMD_SIZE] = {};
         label_t labels[LABELS_NUM] = {};

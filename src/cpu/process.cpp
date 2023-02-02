@@ -21,15 +21,15 @@ cpu_dump(double *cmd_buf, size_t cmd_count, size_t ip)
         printf("CPU dump:\n");
 
         for (size_t i = 0; i < cmd_count; i++)
-                printf("%02zu ", i);
+                printf("%03zu ", i);
         printf("\n");
 
         for (size_t i = 0; i < cmd_count; i++)
-                printf("%02lg ", cmd_buf[i]);
+                printf("%03lg ", cmd_buf[i]);
         printf("\n");
 
         for (size_t i = 0; i < ip; i++)
-                printf("   ");
+                printf("    ");
         printf("^\n");
 }
 
